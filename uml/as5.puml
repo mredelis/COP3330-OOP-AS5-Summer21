@@ -1,0 +1,92 @@
+@startuml
+
+class InventoryTracker {
+    start()
+    main()
+}
+
+class SceneManager {
+    scenes: Map<String, Scene>
+
+    load()
+    getScene(String): Scene
+}
+
+class MainWindowController {
+    items: ItemModel
+    scenes: SceneManager
+    fileManager: FileManager
+
+    + MainWindowController(ItemModel, SceneManager)
+
+    addItemButtonClicked(EventHandler)
+    editItemButtonClicked(EventHandler)
+    removeItemButtonClicked(EventHandler)
+
+    saveInventoryAsTSVButtonClicked(EventHandler)
+    saveInventoryAsHTMLButtonClicked(EventHandler)
+    saveInventoryAsJSONButtonClicked(EventHandler)
+
+    addItem(String, String, BigDecimal)
+    editItem()
+
+    saveInventoryAsTSV(filename: String)
+    saveInventoryAsHTML(filename: String)
+    saveInventoryAsJSON(filename: String)
+}
+
+class FileManager {
+    saveAsTSV(filename: String), data: String)
+    saveAsJSON(filename: String), data: String)
+    saveAsHTML(filename: String), data: String)
+}
+
+class AddItemWindowController {
+}
+
+class EditItemWindowController {
+}
+
+class RemoveItemWindowController {
+}
+
+class SearchItemWindowController {
+}
+
+class ItemModel {
+    - ObservableList<Item>
+
+    /' ObservableList is not serializable
+       Copying everything over a normal list
+       Use Gson on that normal list '/
+}
+
+class Item {
+    - name: SimpleStringProperty
+    - serialNumber: SimpleStringProperty
+    - value: SimpleDoubleProperty
+
+    + getName()
+    + setName()
+    + getSerialNumber()
+    + setSerialNumber()
+    + getValue()
+    + setValue()
+}
+
+openjfx.org.Application <|-- InventoryTracker
+InventoryTracker -- SceneManager
+SceneManager -- MainWindowController
+SceneManager -- AddItemWindowController
+SceneManager -- EditItemWindowController
+SceneManager -- RemoveItemWindowController
+SceneManager -- SearchItemWindowController
+MainWindowController o-- ItemModel
+AddItemWindowController o-- ItemModel
+EditItemWindowController o-- ItemModel
+RemoveItemWindowController o-- ItemModel
+SearchItemWindowController o-- ItemModel
+ItemModel *-- Item
+MainWindowController o-- FileManager
+
+@enduml
