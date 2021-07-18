@@ -1,0 +1,8 @@
+ucf/assignments/InventoryTracker.java
+ ucf.assignments.InventoryTracker
+ucf/assignments/MainWindowController.java
+ ucf.assignments.MainWindowController
+ucf/assignments/Item.java
+ ucf.assignments.Item
+ucf/assignments/ItemModel.java
+ ucf.assignments.ItemModel
