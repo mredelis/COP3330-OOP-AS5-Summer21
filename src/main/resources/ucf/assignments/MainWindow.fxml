@@ -14,9 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ucf.assignments.MainWindowController">
-    <children>
         <MenuBar layoutX="146.0" layoutY="181.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <MenuItem mnemonicParsing="false" text="Save As..." />
                     <MenuItem mnemonicParsing="false" text="Load..." />
@@ -31,24 +29,22 @@
                     <SeparatorMenuItem mnemonicParsing="false" />
                     <MenuItem mnemonicParsing="false" text="About" />
                 </Menu>
-            </menus>
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </padding>
         </MenuBar>
         <VBox layoutY="35.0" prefHeight="465.0" prefWidth="700.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
-            <children>
                 <HBox alignment="CENTER_RIGHT" prefHeight="50.0" spacing="10.0">
                     <children>
-                        <TextField prefHeight="25.0" prefWidth="283.0" promptText="Type Item Serial Number or Description" />
-                        <Button mnemonicParsing="false" text="Search...." />
+                        <TextField fx:id="searchTextField" prefHeight="25.0" prefWidth="283.0" promptText="Type Item Serial Number or Description" />
+                        <Button fx:id="searchButton" mnemonicParsing="false" text="Search...." />
                     </children>
                 </HBox>
-                <TableView>
+                <TableView fx:id="tableView">
                     <columns>
-                        <TableColumn prefWidth="200.0" text="Serial Number" />
-                        <TableColumn prefWidth="300.0" text="Item Name" />
-                        <TableColumn prefWidth="159.0" text="Value" />
+                        <TableColumn fx:id="itemSerialNumberColumn" prefWidth="200.0" text="Serial Number" />
+                        <TableColumn fx:id="itemNameColumn" prefWidth="300.0" text="Item Name" />
+                        <TableColumn fx:id="itemValueColumn" prefWidth="159.0" text="Value" />
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -56,22 +52,20 @@
                 </TableView>
                 <HBox prefHeight="50.0" spacing="5.0">
                     <children>
-                        <TextField promptText="Item Serial Number" />
-                        <TextField prefHeight="25.0" prefWidth="270.0" promptText="Item Name" />
-                        <TextField prefHeight="25.0" prefWidth="134.0" promptText="Item Price" />
-                        <Button mnemonicParsing="false" text="Add New Item" />
+                        <TextField fx:id="itemSerialNumberTextField" promptText="Item Serial Number" />
+                        <TextField fx:id="itemNameTextField" prefHeight="25.0" prefWidth="270.0" promptText="Item Name" />
+                        <TextField fx:id="itemValueTextField" prefHeight="25.0" prefWidth="134.0" promptText="Item Price" />
+                        <Button fx:id="addNewItemButton" mnemonicParsing="false" text="Add New Item" />
                     </children>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                     <children>
-                        <Button mnemonicParsing="false" text="Delete Selected Item" />
-                        <Button mnemonicParsing="false" text="Update Selected Item" />
+                        <Button fx:id="deleteSelectedItemButton" mnemonicParsing="false" text="Delete Selected Item" />
+                        <Button fx:id="updateSelectedItemButton" mnemonicParsing="false" text="Update Selected Item" />
                     </children>
                 </HBox>
-            </children>
             <padding>
                 <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
             </padding>
         </VBox>
-    </children>
 </AnchorPane>
