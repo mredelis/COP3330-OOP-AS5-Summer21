@@ -54,6 +54,7 @@ public class MainWindowController implements Initializable {
         itemValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
 
         // Allow for the table fields to be editable
+        tableView.setEditable(true);
         itemSerialNumberColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         itemNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         itemValueColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
@@ -67,7 +68,6 @@ public class MainWindowController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
 
