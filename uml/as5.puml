@@ -28,6 +28,7 @@ class MainWindowController {
     saveInventoryAsJSONButtonClicked(EventHandler)
 
     addItem(String, String, Double)
+    deleteItem()
     editItem()
 
     saveInventoryAsTSV(filename: String)

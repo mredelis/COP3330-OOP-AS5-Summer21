@@ -5,6 +5,8 @@ package ucf.assignments;
  *  Copyright 2021 Edelis Molina
  */
 
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,8 +15,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
 
+import javax.naming.Binding;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -33,10 +38,10 @@ public class MainWindowController implements Initializable {
     @FXML private TextField itemValueTextField;
     @FXML private Button addNewItemButton;
     @FXML private Button deleteSelectedItemButton;
-    @FXML private Button updateSelectedItemButton;
     @FXML private Label serialNumErrorLabel;
     @FXML private Label nameErrorLabel;
     @FXML private Label priceErrorLabel;
+    @FXML private MenuBar menuBar;
 
 
     public MainWindowController() {
@@ -55,6 +60,10 @@ public class MainWindowController implements Initializable {
         itemSerialNumberColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         itemNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         itemValueColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+
+        // Bind delete button to selection of the table. Delete button will be disable is no row is selected
+        deleteSelectedItemButton.disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
+
 
         // load dummy data for testing
         try {
@@ -80,9 +89,6 @@ public class MainWindowController implements Initializable {
 
         if(serialNumText.isEmpty() || nameText.isEmpty() || itemValueTextField.getText().isEmpty()) {
             addItemInvalidInputAlert("All fields must be filled in to add a new item.");
-//            itemSerialNumberTextField.clear();
-//            itemNameTextField.clear();
-//            itemValueTextField.clear();
             validInput = false;
         }
         else {
@@ -101,15 +107,13 @@ public class MainWindowController implements Initializable {
                 serialNumErrorLabel.setText("Invalid Serial Number.");
                 itemSerialNumberTextField.clear();
                 validInput = false;
-            } else {
-                if(containsSerialNumber(serialNumText)) {
+            }
+            else if (containsSerialNumber(serialNumText)) {
                     serialNumErrorLabel.setVisible(true);
                     serialNumErrorLabel.setText("Serial number already exists.");
                     itemSerialNumberTextField.clear();
                     validInput = false;
-                }
             }
-
 
             try {
                 price = Double.parseDouble(itemValueTextField.getText());
@@ -150,14 +154,30 @@ public class MainWindowController implements Initializable {
         itemModel.getItems().add(new Item(serialNumber, name, price));
     }
 
-    private boolean containsSerialNumber(String serialNumText){
+    public boolean containsSerialNumber(String serialNumText){
         for(int i = 0; i < itemModel.getItems().size(); i++){
             if(itemModel.getItems().get(i).getSerialNumber().equalsIgnoreCase(serialNumText)){
                 return true;
             }
         }
-
         return false;
+    }
+
+
+    public void closeApp() {
+        Alert exitAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        Stage stage = (Stage) menuBar.getScene().getWindow();
+        exitAlert.setTitle("Exit Application");
+        exitAlert.setHeaderText("Are you sure you want to exit?");
+        exitAlert.initModality(Modality.APPLICATION_MODAL);
+        exitAlert.initOwner(stage);
+        exitAlert.showAndWait();
+
+        if (exitAlert.getResult() == ButtonType.OK) {
+            Platform.exit();
+        } else {
+            exitAlert.close();
+        }
     }
 
 

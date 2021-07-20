@@ -16,12 +16,12 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ucf.assignments.MainWindowController">
-        <MenuBar layoutX="146.0" layoutY="181.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <MenuBar fx:id="menuBar" layoutX="146.0" layoutY="181.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <Menu mnemonicParsing="false" text="File">
                     <MenuItem mnemonicParsing="false" text="Save As..." />
                     <MenuItem mnemonicParsing="false" text="Load..." />
                     <SeparatorMenuItem mnemonicParsing="false" />
-                    <MenuItem mnemonicParsing="false" text="Quit" />
+                    <MenuItem mnemonicParsing="false" onAction="#closeApp" text="Quit" />
                 </Menu>
                 <Menu mnemonicParsing="false" text="Find">
                     <MenuItem mnemonicParsing="false" text="Search..." />
