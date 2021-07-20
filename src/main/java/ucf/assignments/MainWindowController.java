@@ -16,15 +16,11 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
 
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 public class MainWindowController implements Initializable {
 
-    private ItemModel itemModel;
-    private Set<String> serialNumSet;
+    private final ItemModel itemModel;
 
     @FXML private TextField searchTextField;
     @FXML private Button searchButton;
@@ -45,7 +41,6 @@ public class MainWindowController implements Initializable {
 
     public MainWindowController() {
         this.itemModel = new ItemModel();
-        serialNumSet = new HashSet<>();
     }
 
     @Override
