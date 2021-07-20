@@ -81,6 +81,7 @@ public class MainWindowController implements Initializable {
 
         String serialNumText = itemSerialNumberTextField.getText().toUpperCase();
         String nameText = itemNameTextField.getText();
+        Double price = null;
 
         if(serialNumText.isEmpty() || nameText.isEmpty() || itemValueTextField.getText().isEmpty()) {
             addItemInvalidInputAlert("All fields must be filled in to add a new item.");
@@ -105,10 +106,18 @@ public class MainWindowController implements Initializable {
                 serialNumErrorLabel.setText("Invalid Serial Number.");
                 itemSerialNumberTextField.clear();
                 validInput = false;
+            } else {
+                if(containsSerialNumber(serialNumText)) {
+                    serialNumErrorLabel.setVisible(true);
+                    serialNumErrorLabel.setText("Serial number already exists.");
+                    itemSerialNumberTextField.clear();
+                    validInput = false;
+                }
             }
 
+
             try {
-                Double price = Double.parseDouble(itemValueTextField.getText());
+                price = Double.parseDouble(itemValueTextField.getText());
             } catch (NumberFormatException e) {
 //                addItemInvalidInputAlert("Enter a valid price for the item.");
                 priceErrorLabel.setVisible(true);
@@ -118,10 +127,18 @@ public class MainWindowController implements Initializable {
             }
         }
 
+        if(validInput){
+            addItem(serialNumText, nameText, price);
 
+            itemSerialNumberTextField.setPromptText("Item Serial Number");
+            itemSerialNumberTextField.clear();
 
+            itemNameTextField.setPromptText("Item Name");
+            itemNameTextField.clear();
 
-
+            itemValueTextField.setPromptText("Item Price");
+            itemValueTextField.clear();
+        }
     }
 
 
@@ -134,18 +151,28 @@ public class MainWindowController implements Initializable {
     }
 
 
-    public void addItem(String serialNumber, String name, Double value) {
-        itemModel.getItems().add(new Item(serialNumber, name, value));
+    public void addItem(String serialNumber, String name, Double price) {
+        itemModel.getItems().add(new Item(serialNumber, name, price));
+    }
+
+    private boolean containsSerialNumber(String serialNumText){
+        for(int i = 0; i < itemModel.getItems().size(); i++){
+            if(itemModel.getItems().get(i).getSerialNumber().equalsIgnoreCase(serialNumText)){
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
     // Method to return an ObservableList of Inventory Item Objects
     public ObservableList<Item> getTestItems() {
         ObservableList<Item> items = FXCollections.observableArrayList();
-        items.add(new Item("Xbox One", "AXB124AXYE", 399.00));
-        items.add(new Item("Samsung TV", "S40AZBDE4E", 599.99));
-        items.add(new Item("iPad Pro", "ABCDE12345", 999.99));
-        items.add(new Item("Microsoft Surface", "QWERTY321", 499.99));
+        items.add(new Item("AXB124AXYE","Xbox One", 399.00));
+        items.add(new Item("S40AZBDE4E","Samsung TV", 599.99));
+        items.add(new Item("ABCDE12345","iPad Pro", 999.99));
+        items.add(new Item("ABX4H321SW","Microsoft Surface", 499.99));
 
         return items;
     }
