@@ -21,15 +21,13 @@
                     <MenuItem mnemonicParsing="false" text="Save As..." />
                     <MenuItem mnemonicParsing="false" text="Load..." />
                     <SeparatorMenuItem mnemonicParsing="false" />
-                    <MenuItem mnemonicParsing="false" onAction="#closeApp" text="Quit" />
+                    <MenuItem mnemonicParsing="false" onAction="#menuItemQuitClicked" text="Quit" />
                 </Menu>
                 <Menu mnemonicParsing="false" text="Find">
                     <MenuItem mnemonicParsing="false" text="Search..." />
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
-                    <MenuItem mnemonicParsing="false" text="Get Help" />
-                    <SeparatorMenuItem mnemonicParsing="false" />
-                    <MenuItem mnemonicParsing="false" text="About" />
+                    <MenuItem mnemonicParsing="false" onAction="#menuItemGetHelpClicked" text="Get Help" />
                 </Menu>
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -81,7 +79,7 @@
       </HBox>
                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
                     <children>
-                        <Button fx:id="deleteSelectedItemButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Delete Selected Item" />
+                        <Button fx:id="deleteSelectedItemButton" mnemonicParsing="false" onAction="#deleteSelectedItemButtonClicked" prefHeight="25.0" prefWidth="149.0" text="Delete Selected Item" />
                     </children>
                 </HBox>
             <padding>
