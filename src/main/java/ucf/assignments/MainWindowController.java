@@ -19,7 +19,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
 
-import javax.naming.Binding;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -71,6 +70,7 @@ public class MainWindowController implements Initializable {
             tableView.setItems(itemModel.getItems());
 
         } catch (Exception e) {
+            tableView.setItems(null);
             e.printStackTrace();
         }
     }
@@ -87,38 +87,34 @@ public class MainWindowController implements Initializable {
         String nameText = itemNameTextField.getText();
         Double price = null;
 
-        if(serialNumText.isEmpty() || nameText.isEmpty() || itemValueTextField.getText().isEmpty()) {
-            addItemInvalidInputAlert("All fields must be filled in to add a new item.");
+        if (serialNumText.isEmpty() || nameText.isEmpty() || itemValueTextField.getText().isEmpty()) {
+            // Alert the user to enter information in all text fields
+            errorMessage("All fields must be filled in to add a new item.");
+
             validInput = false;
-        }
-        else {
+
+        } else {
             if (nameText.length() < 2 || nameText.length() > 256) {
                 nameErrorLabel.setVisible(true);
                 nameErrorLabel.setText("Item name must be between 2 and 256 characters.");
-//                addItemInvalidInputAlert("Item name must be between 2 and 256 characters.");
                 itemNameTextField.clear();
                 validInput = false;
             }
 
-            if(!(serialNumText.matches("[0-9A-Z]+") && serialNumText.length() == 10)){
-//                addItemInvalidInputAlert("Serial number can be either a letter or digit of length 10.");
-//                itemSerialNumberTextField.setPromptText("Serial number can be either a letter or digit of length 10.");
+            if (!(serialNumText.matches("[0-9A-Z]+") && serialNumText.length() == 10)) {
                 serialNumErrorLabel.setVisible(true);
                 serialNumErrorLabel.setText("Invalid Serial Number.");
                 itemSerialNumberTextField.clear();
                 validInput = false;
-            }
-            else if (containsSerialNumber(serialNumText)) {
-                    serialNumErrorLabel.setVisible(true);
-                    serialNumErrorLabel.setText("Serial number already exists.");
-                    itemSerialNumberTextField.clear();
-                    validInput = false;
+            } else if (containsSerialNumber(serialNumText)) {
+                errorMessage("Serial number already exists.");
+                itemSerialNumberTextField.clear();
+                validInput = false;
             }
 
             try {
                 price = Double.parseDouble(itemValueTextField.getText());
             } catch (NumberFormatException e) {
-//                addItemInvalidInputAlert("Enter a valid price for the item.");
                 priceErrorLabel.setVisible(true);
                 priceErrorLabel.setText("Invalid price.");
                 itemValueTextField.clear();
@@ -126,7 +122,7 @@ public class MainWindowController implements Initializable {
             }
         }
 
-        if(validInput){
+        if (validInput) {
             addItem(serialNumText, nameText, price);
 
             itemSerialNumberTextField.setPromptText("Item Serial Number");
@@ -138,15 +134,6 @@ public class MainWindowController implements Initializable {
             itemValueTextField.setPromptText("Item Price");
             itemValueTextField.clear();
         }
-    }
-
-
-    private void addItemInvalidInputAlert(String contentText) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error Alert");
-        alert.setHeaderText("Item cannot be added");
-        alert.setContentText(contentText);
-        alert.showAndWait();
     }
 
 
@@ -163,8 +150,30 @@ public class MainWindowController implements Initializable {
         return false;
     }
 
+    private void errorMessage(String contentText) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error Alert");
+        alert.setHeaderText("Item cannot be added");
+        alert.setContentText(contentText);
+        alert.showAndWait();
+    }
 
-    public void closeApp() {
+    @FXML
+    void deleteSelectedItemButtonClicked(ActionEvent event) {
+        if(!itemModel.getItems().isEmpty()){
+            Item selectedItem = tableView.getSelectionModel().getSelectedItem();
+            deleteItem(selectedItem);
+            tableView.getSelectionModel().clearSelection();
+        }
+    }
+
+    public void deleteItem(Item selectedItem){
+        itemModel.getItems().remove(selectedItem);
+    }
+
+
+    @FXML
+    void menuItemQuitClicked(ActionEvent event) {
         Alert exitAlert = new Alert(Alert.AlertType.CONFIRMATION);
         Stage stage = (Stage) menuBar.getScene().getWindow();
         exitAlert.setTitle("Exit Application");
@@ -180,6 +189,14 @@ public class MainWindowController implements Initializable {
         }
     }
 
+    @FXML
+    void menuItemGetHelpClicked(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Get Help");
+        alert.setHeaderText("Refer to file README.md in the GitHub Repository for the project");
+        alert.showAndWait();
+    }
+
 
     // Method to return an ObservableList of Inventory Item Objects
     public ObservableList<Item> getTestItems() {
@@ -191,7 +208,5 @@ public class MainWindowController implements Initializable {
 
         return items;
     }
-
-
 
 }

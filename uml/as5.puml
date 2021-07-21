@@ -21,7 +21,7 @@ class MainWindowController {
 
     addItemButtonClicked(EventHandler)
     editItemButtonClicked(EventHandler)
-    removeItemButtonClicked(EventHandler)
+    deleteSelectedItemButtonClicked(EventHandler)
 
     saveInventoryAsTSVButtonClicked(EventHandler)
     saveInventoryAsHTMLButtonClicked(EventHandler)
