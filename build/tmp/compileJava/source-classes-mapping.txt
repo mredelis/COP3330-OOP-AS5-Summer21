@@ -6,3 +6,4 @@ ucf/assignments/Item.java
  ucf.assignments.Item
 ucf/assignments/MainWindowController.java
  ucf.assignments.MainWindowController
+ ucf.assignments.MainWindowController$1

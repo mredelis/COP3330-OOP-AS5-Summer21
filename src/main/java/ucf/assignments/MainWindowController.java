@@ -55,10 +55,24 @@ public class MainWindowController implements Initializable {
         itemValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
 
         // Allow for the table fields to be editable
-        tableView.setEditable(true);
-        itemSerialNumberColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        itemNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        itemValueColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+//        tableView.setEditable(true);
+//        itemSerialNumberColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+//        itemNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+//        itemValueColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+
+        itemValueColumn.setCellFactory(tc -> new TableCell<Item, Double>() {
+            @Override
+            protected void updateItem(Double value, boolean empty) {
+                super.updateItem(value, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(String.format("$%.2f", value.floatValue()));
+                }
+            }
+        });
+
+
 
         // Bind delete button to selection of the table. Delete button will be disable is no row is selected
         deleteSelectedItemButton.disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
@@ -204,7 +218,7 @@ public class MainWindowController implements Initializable {
         items.add(new Item("AXB124AXYE","Xbox One", 399.00));
         items.add(new Item("S40AZBDE4E","Samsung TV", 599.99));
         items.add(new Item("ABCDE12345","iPad Pro", 999.99));
-        items.add(new Item("ABX4H321SW","Microsoft Surface", 499.99));
+        items.add(new Item("ABX4H321SW","Microsoft Surface", 499.9945));
 
         return items;
     }
