@@ -25,6 +25,9 @@ import javafx.util.converter.DoubleStringConverter;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class MainWindowController implements Initializable {
@@ -91,7 +94,13 @@ public class MainWindowController implements Initializable {
             tableView.setItems(null);
             e.printStackTrace();
         }
+
+        searchTextField.textProperty().addListener((observable, oldValue, newValue) ->
+            tableView.setItems(filterList(newValue))
+        );
+
     }
+
 
     @FXML
     void addNewItemButtonClicked(ActionEvent event) {
@@ -254,6 +263,26 @@ public class MainWindowController implements Initializable {
         tableView.getItems().set(index, selectedItem);
 
     }
+
+
+
+    public ObservableList<Item> filterList(String searchText) {
+        List<Item> filteredList = new ArrayList<>();
+
+        for(int i = 0; i < itemModel.getItems().size(); i++) {
+            if(searchFindsItem(itemModel.getItems().get(i), searchText)) {
+                filteredList.add(itemModel.getItems().get(i));
+            }
+        }
+        return FXCollections.observableArrayList(filteredList);
+    }
+
+
+    public boolean searchFindsItem(Item item, String searchText) {
+        return (item.getName().toLowerCase().contains(searchText.toLowerCase()) ||
+            item.getSerialNumber().toLowerCase().contains(searchText.toLowerCase()));
+    }
+
 
 
 }
