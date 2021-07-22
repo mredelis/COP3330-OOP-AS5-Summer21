@@ -1,5 +1,7 @@
-ucf/assignments/InventoryTracker.java
- ucf.assignments.InventoryTracker
+ucf/assignments/UpdateItemController.java
+ ucf.assignments.UpdateItemController
+ucf/assignments/InventoryManager.java
+ ucf.assignments.InventoryManager
 ucf/assignments/ItemModel.java
  ucf.assignments.ItemModel
 ucf/assignments/Item.java

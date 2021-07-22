@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class InventoryTracker extends Application {
+public class InventoryManager extends Application {
 
     public static void main(String[] args) {
         launch(args);

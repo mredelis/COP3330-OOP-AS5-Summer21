@@ -77,9 +77,10 @@
             </Label>
          </children>
       </HBox>
-                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                     <children>
-                        <Button fx:id="deleteSelectedItemButton" mnemonicParsing="false" onAction="#deleteSelectedItemButtonClicked" prefHeight="25.0" prefWidth="149.0" text="Delete Selected Item" />
+                        <Button fx:id="deleteSelectedItemButton" mnemonicParsing="false" onAction="#deleteSelectedItemButtonClicked" prefWidth="150.0" text="Delete Selected Item" />
+            <Button fx:id="updateSelectedItemButton" mnemonicParsing="false" onAction="#updateSelectedItemButtonClicked" prefWidth="150.0" text="Update Selected Item" />
                     </children>
                 </HBox>
             <padding>

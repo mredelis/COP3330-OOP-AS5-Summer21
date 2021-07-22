@@ -11,7 +11,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -19,12 +23,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class MainWindowController implements Initializable {
 
-    private final ItemModel itemModel;
+    private ItemModel itemModel;
 
     @FXML private TextField searchTextField;
     @FXML private Button searchButton;
@@ -37,6 +42,7 @@ public class MainWindowController implements Initializable {
     @FXML private TextField itemValueTextField;
     @FXML private Button addNewItemButton;
     @FXML private Button deleteSelectedItemButton;
+    @FXML private Button updateSelectedItemButton;
     @FXML private Label serialNumErrorLabel;
     @FXML private Label nameErrorLabel;
     @FXML private Label priceErrorLabel;
@@ -72,11 +78,9 @@ public class MainWindowController implements Initializable {
             }
         });
 
-
-
-        // Bind delete button to selection of the table. Delete button will be disable is no row is selected
+        // Bind Delete & Update buttons to selection of the table. Delete and Update buttons will be disable is no row is selected
         deleteSelectedItemButton.disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
-
+        updateSelectedItemButton.disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
 
         // load dummy data for testing
         try {
@@ -222,5 +226,37 @@ public class MainWindowController implements Initializable {
 
         return items;
     }
+
+    @FXML
+    void updateSelectedItemButtonClicked(ActionEvent event) throws IOException {
+        // Equivalent to Parent tableViewParent = FXMLLoader(getClass().getResource("UpdateItem.fxml"))
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("UpdateItem.fxml"));
+
+
+
+
+
+        // Get selected Item
+        Item selectedItem = tableView.getSelectionModel().getSelectedItem();
+
+        // Create a controller instance
+        UpdateItemController controller = new UpdateItemController(itemModel, selectedItem);
+
+        // Set in the FXML loader
+        loader.setController(controller);
+
+        Parent tableViewParent = loader.load();
+
+        // Set the scene
+        Scene tableViewScene = new Scene(tableViewParent);
+
+        //This line gets the Stage information
+        Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
+
+        window.setScene(tableViewScene);
+        window.show();
+
+    }
+
 
 }
