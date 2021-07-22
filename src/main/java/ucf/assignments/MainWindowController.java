@@ -231,6 +231,7 @@ public class MainWindowController implements Initializable {
     void updateSelectedItemButtonClicked(ActionEvent event) throws IOException {
         // Get selected Item
         Item selectedItem = tableView.getSelectionModel().getSelectedItem();
+        int index = tableView.getSelectionModel().getSelectedIndex();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("UpdateItem.fxml"));
 
@@ -248,7 +249,9 @@ public class MainWindowController implements Initializable {
         secondaryStage.setScene(updateItemScene);
         secondaryStage.setTitle("Update Item");
         secondaryStage.initModality(Modality.APPLICATION_MODAL);
-        secondaryStage.show();
+        secondaryStage.showAndWait();
+
+        tableView.getItems().set(index, selectedItem);
 
     }
 
