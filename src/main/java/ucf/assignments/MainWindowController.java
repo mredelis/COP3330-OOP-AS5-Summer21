@@ -229,32 +229,26 @@ public class MainWindowController implements Initializable {
 
     @FXML
     void updateSelectedItemButtonClicked(ActionEvent event) throws IOException {
-        // Equivalent to Parent tableViewParent = FXMLLoader(getClass().getResource("UpdateItem.fxml"))
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("UpdateItem.fxml"));
-
-
-
-
-
         // Get selected Item
         Item selectedItem = tableView.getSelectionModel().getSelectedItem();
 
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("UpdateItem.fxml"));
+
         // Create a controller instance
         UpdateItemController controller = new UpdateItemController(itemModel, selectedItem);
-
         // Set in the FXML loader
         loader.setController(controller);
 
-        Parent tableViewParent = loader.load();
+        Parent updateItemParent = loader.load();
 
         // Set the scene
-        Scene tableViewScene = new Scene(tableViewParent);
+        Scene updateItemScene = new Scene(updateItemParent);
 
-        //This line gets the Stage information
-        Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
-
-        window.setScene(tableViewScene);
-        window.show();
+        Stage secondaryStage = new Stage();
+        secondaryStage.setScene(updateItemScene);
+        secondaryStage.setTitle("Update Item");
+        secondaryStage.initModality(Modality.APPLICATION_MODAL);
+        secondaryStage.show();
 
     }
 
