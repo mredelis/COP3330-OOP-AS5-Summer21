@@ -19,41 +19,58 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
+import org.apache.commons.io.FilenameUtils;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainWindowController implements Initializable {
 
     private ItemModel itemModel;
+    private FileChooser fileChooser;
 
-    @FXML private TextField searchTextField;
-    @FXML private Button searchButton;
-    @FXML private TableView<Item> tableView;
-    @FXML private TableColumn<Item, String> itemSerialNumberColumn;
-    @FXML private TableColumn<Item, String> itemNameColumn;
-    @FXML private TableColumn<Item, Double> itemValueColumn;
-    @FXML private TextField itemSerialNumberTextField;
-    @FXML private TextField itemNameTextField;
-    @FXML private TextField itemValueTextField;
-    @FXML private Button addNewItemButton;
-    @FXML private Button deleteSelectedItemButton;
-    @FXML private Button updateSelectedItemButton;
-    @FXML private Label serialNumErrorLabel;
-    @FXML private Label nameErrorLabel;
-    @FXML private Label priceErrorLabel;
-    @FXML private MenuBar menuBar;
+    @FXML
+    private TextField searchTextField;
+    @FXML
+    private Button searchButton;
+    @FXML
+    private TableView<Item> tableView;
+    @FXML
+    private TableColumn<Item, String> itemSerialNumberColumn;
+    @FXML
+    private TableColumn<Item, String> itemNameColumn;
+    @FXML
+    private TableColumn<Item, Double> itemValueColumn;
+    @FXML
+    private TextField itemSerialNumberTextField;
+    @FXML
+    private TextField itemNameTextField;
+    @FXML
+    private TextField itemValueTextField;
+    @FXML
+    private Button addNewItemButton;
+    @FXML
+    private Button deleteSelectedItemButton;
+    @FXML
+    private Button updateSelectedItemButton;
+    @FXML
+    private Label serialNumErrorLabel;
+    @FXML
+    private Label nameErrorLabel;
+    @FXML
+    private Label priceErrorLabel;
+    @FXML
+    private MenuBar menuBar;
 
 
     public MainWindowController() {
         this.itemModel = new ItemModel();
+        this.fileChooser = new FileChooser();
     }
 
     @Override
@@ -141,6 +158,7 @@ public class MainWindowController implements Initializable {
 
             try {
                 price = Double.parseDouble(itemValueTextField.getText());
+
             } catch (NumberFormatException e) {
                 priceErrorLabel.setVisible(true);
                 priceErrorLabel.setText("Invalid price.");
@@ -150,7 +168,9 @@ public class MainWindowController implements Initializable {
         }
 
         if (validInput) {
-            addItem(serialNumText, nameText, price);
+
+            Item item = addItem(serialNumText, nameText, price);
+            itemModel.getItems().add(item);
 
             itemSerialNumberTextField.setPromptText("Item Serial Number");
             itemSerialNumberTextField.clear();
@@ -164,13 +184,13 @@ public class MainWindowController implements Initializable {
     }
 
 
-    public void addItem(String serialNumber, String name, Double price) {
-        itemModel.getItems().add(new Item(serialNumber, name, price));
+    public Item addItem(String serialNumber, String name, Double price) {
+        return new Item(serialNumber, name, price);
     }
 
-    public boolean containsSerialNumber(String serialNumText){
-        for(int i = 0; i < itemModel.getItems().size(); i++){
-            if(itemModel.getItems().get(i).getSerialNumber().equalsIgnoreCase(serialNumText)){
+    public boolean containsSerialNumber(String serialNumText) {
+        for (int i = 0; i < itemModel.getItems().size(); i++) {
+            if (itemModel.getItems().get(i).getSerialNumber().equalsIgnoreCase(serialNumText)) {
                 return true;
             }
         }
@@ -187,14 +207,14 @@ public class MainWindowController implements Initializable {
 
     @FXML
     void deleteSelectedItemButtonClicked(ActionEvent event) {
-        if(!itemModel.getItems().isEmpty()){
+        if (!itemModel.getItems().isEmpty()) {
             Item selectedItem = tableView.getSelectionModel().getSelectedItem();
             deleteItem(selectedItem);
             tableView.getSelectionModel().clearSelection();
         }
     }
 
-    public void deleteItem(Item selectedItem){
+    public void deleteItem(Item selectedItem) {
         itemModel.getItems().remove(selectedItem);
     }
 
@@ -228,10 +248,10 @@ public class MainWindowController implements Initializable {
     // Method to return an ObservableList of Inventory Item Objects
     public ObservableList<Item> getTestItems() {
         ObservableList<Item> items = FXCollections.observableArrayList();
-        items.add(new Item("AXB124AXYE","Xbox One", 399.00));
-        items.add(new Item("S40AZBDE4E","Samsung TV", 599.99));
-        items.add(new Item("ABCDE12345","iPad Pro", 999.99));
-        items.add(new Item("ABX4H321SW","Microsoft Surface", 499.9945));
+        items.add(new Item("AXB124AXYE", "Xbox One", 399.00));
+        items.add(new Item("S40AZBDE4E", "Samsung TV", 599.99));
+        items.add(new Item("ABCDE12345", "iPad Pro", 999.99));
+        items.add(new Item("ABX4H321SW", "Microsoft Surface", 499.9945));
 
         return items;
     }
@@ -265,12 +285,12 @@ public class MainWindowController implements Initializable {
     }
 
 
-
+    // Search ---------------------------------------------------------------------------
     public ObservableList<Item> filterList(String searchText) {
         List<Item> filteredList = new ArrayList<>();
 
-        for(int i = 0; i < itemModel.getItems().size(); i++) {
-            if(searchFindsItem(itemModel.getItems().get(i), searchText)) {
+        for (int i = 0; i < itemModel.getItems().size(); i++) {
+            if (searchFindsItem(itemModel.getItems().get(i), searchText)) {
                 filteredList.add(itemModel.getItems().get(i));
             }
         }
@@ -282,7 +302,215 @@ public class MainWindowController implements Initializable {
         return (item.getName().toLowerCase().contains(searchText.toLowerCase()) ||
             item.getSerialNumber().toLowerCase().contains(searchText.toLowerCase()));
     }
+    // End of Search ---------------------------------------------------------------------------
 
+
+    // Save as ---------------------------------------------------------------------------------
+    @FXML
+    void menuItemSaveAsClicked(ActionEvent event) {
+
+        fileChooser.setTitle("Save As");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Text (Tab delimited)", "*.txt"),
+            new FileChooser.ExtensionFilter("Web Page", "*.html"),
+            new FileChooser.ExtensionFilter("JSON (JavaScript Object Notation)", "*.json"));
+
+
+        File file = fileChooser.showSaveDialog(new Stage());
+        // save the chosen directory for next time
+        fileChooser.setInitialDirectory(file.getParentFile());
+
+        String fileName = file.getName();
+        String fileExtension = FilenameUtils.getExtension(fileName);
+
+        // For testing. Delete before final submission
+        System.out.println(file);
+        System.out.println(fileName);
+        System.out.println(fileExtension);
+
+        if (file != null) {
+            switch (fileExtension) {
+                case "txt" -> saveInventoryAsTSV(file);
+                case "html" -> saveInventoryAsHTML(file);
+                case "json" -> saveInventoryAsJSON(file);
+            }
+
+        }
+    }
+
+
+    public void saveInventoryAsTSV(File file) {
+
+        try {
+            // create a writer
+            BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
+
+            // Write one inventory Item per line and separate each field with a /t character
+            for (int i = 0; i < itemModel.getItems().size(); i++) {
+                outWriter.write(itemModel.getItems().get(i).convertItemToTSVString());
+                // New line for each Item
+                outWriter.newLine();
+            }
+
+            outWriter.close();
+
+        } catch (IOException e) {
+            System.out.println("A writing error has occurred.");
+            e.printStackTrace();
+        }
+    }
+
+
+    public void saveInventoryAsHTML(File file) {
+        // Create html String
+        String htmlString = buildHTMLString();
+        // create a writer
+        try {
+            BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
+            outWriter.write(htmlString);
+
+            outWriter.close();
+        } catch (IOException e) {
+            System.out.println("A writing error has occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    public String buildHTMLString() {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(" <!DOCTYPE html>\n" +
+            "<html>\n" +
+            "<style type=\"text/css\">\n" +
+            ".tg  {border-collapse:collapse;border-spacing:0;}\n" +
+            ".tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;\n" +
+            "  overflow:hidden;padding:10px 10px;word-break:normal;}\n" +
+            ".tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;\n" +
+            "  font-weight:normal;overflow:hidden;padding:10px 10px;word-break:normal;}\n" +
+            ".tg .tg-0lax{text-align:left;vertical-align:top}\n" +
+            "</style>\n" +
+            "<head>\n" +
+            "<title>Assignment 5</title>\n" +
+            "</head>\n" +
+            "<body>\n" +
+            "<h1>Inventory Tracker</h1>\n" +
+            "<table class=\"tg\">\n" +
+            "<thead>\n" +
+            "  <tr>\n" +
+            "   <th class=\"tg-0lax\">Serial Number</th>\n" +
+            "   <th class=\"tg-0lax\">Name<br></th>\n" +
+            "   <th class=\"tg-0lax\">Value</th>\n" +
+            "  </tr>\n" +
+            "</thead>\n" +
+            "<tbody>\n");
+        for (int i = 0; i < itemModel.getItems().size(); i++) {
+            buffer.append("  <tr>\n    <td class=\"tg-0lax\">")
+                .append(itemModel.getItems().get(i).getSerialNumber())
+                .append("</td>\n    <td class=\"tg-0lax\">")
+                .append(itemModel.getItems().get(i).getName())
+                .append("</td>\n    <td class=\"tg-0lax\">")
+                .append(itemModel.getItems().get(i).getValue())
+                .append("</td>\n  <tr>\n");
+        }
+        buffer.append(
+            "</tbody>\n" +
+                "</table>\n" +
+                "</body>\n" +
+                "</html> ");
+
+        String html = buffer.toString();
+
+        return html;
+    }
+
+
+    public void saveInventoryAsJSON(File file) {
+
+    }
+
+    // End of Save as ---------------------------------------------------------------------------------
+    //
+    //
+    //
+    //
+    // Load as ---------------------------------------------------------------------------------
+    @FXML
+    void menuItemOpenFileClicked(ActionEvent event) {
+
+        fileChooser.setTitle("Open");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Text (Tab delimited)", "*.txt"),
+            new FileChooser.ExtensionFilter("Web Page", "*.html"),
+            new FileChooser.ExtensionFilter("JSON (JavaScript Object Notation)", "*.json"));
+
+
+        File file = fileChooser.showOpenDialog(new Stage());
+        // save the chosen directory for next time
+        fileChooser.setInitialDirectory(file.getParentFile());
+
+        String fileName = file.getName();
+        String fileExtension = FilenameUtils.getExtension(fileName);
+
+        // For testing. Delete before final submission
+        System.out.println(file);
+        System.out.println(fileName);
+        System.out.println(fileExtension);
+
+        if (file != null) {
+            // Remove previous Items from ItemModel
+            itemModel.getItems().clear();
+
+            List<Item> loadedList = new ArrayList<>();
+
+            switch (fileExtension) {
+                case "txt" -> loadedList = loadInventoryAsTSV(file);
+                case "html" -> loadedList = loadInventoryAsHTML(file);
+                case "json" -> loadedList = loadInventoryAsJSON(file);
+            }
+
+            // Add loaded Items from the file in the table
+            itemModel.getItems().addAll(FXCollections.observableArrayList(loadedList));
+        }
+    }
+
+
+    public List<Item> loadInventoryAsTSV(File file) {
+        List<Item> tempItemList = new ArrayList<>();
+        String[] fields;
+        Double priceField = null;
+
+        try {
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                fields = scanner.nextLine().split("\t");
+
+                try {
+                    priceField = Double.parseDouble(fields[2]);
+                } catch (NumberFormatException e) {
+                    System.out.println(fields[2] + "cannot be parsed into a Double");
+                    e.printStackTrace();
+                }
+
+                // Create an Item and add the newly created Item to a List of Items
+                tempItemList.add(new Item(fields[0], fields[1], priceField));
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println(file + " was not found.");
+            e.printStackTrace();
+        }
+
+        return tempItemList;
+    }
+
+
+    public List<Item> loadInventoryAsHTML(File file) {
+
+        return null;
+    }
+
+    public List<Item> loadInventoryAsJSON(File file) {
+
+        return null;
+    }
 
 
 }

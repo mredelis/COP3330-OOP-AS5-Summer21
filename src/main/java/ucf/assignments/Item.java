@@ -43,4 +43,8 @@ public class Item {
         this.value = new SimpleDoubleProperty(value);
     }
 
+    public String convertItemToTSVString() {
+        return getSerialNumber()+"\t"+getName()+"\t"+getValue();
+    }
+
 }

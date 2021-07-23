@@ -23,9 +23,15 @@ class MainWindowController {
     editItemButtonClicked(EventHandler)
     deleteSelectedItemButtonClicked(EventHandler)
 
-    saveInventoryAsTSVButtonClicked(EventHandler)
-    saveInventoryAsHTMLButtonClicked(EventHandler)
-    saveInventoryAsJSONButtonClicked(EventHandler)
+    menuItemSaveAsClicked(EventHandler)
+    saveInventoryAsTSV(filename: String)
+    saveInventoryAsHTML(filename: String)
+    saveInventoryAsJSON(filename: String)
+
+    menuItemOpenFileClicked(EventHandler)
+    loadInventoryAsTSV(filename: String)
+    loadInventoryAsHTML(filename: String)
+    loadInventoryAsJSON(filename: String)
 
     addItem(String, String, Double)
     deleteItem()
