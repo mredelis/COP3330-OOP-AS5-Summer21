@@ -24,9 +24,16 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
 import org.apache.commons.io.FilenameUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class MainWindowController implements Initializable {
@@ -330,9 +337,15 @@ public class MainWindowController implements Initializable {
 
         if (file != null) {
             switch (fileExtension) {
-                case "txt" -> saveInventoryAsTSV(file);
-                case "html" -> saveInventoryAsHTML(file);
-                case "json" -> saveInventoryAsJSON(file);
+                case "txt":
+                    saveInventoryAsTSV(file);
+                    break;
+                case "html":
+                    saveInventoryAsHTML(file);
+                    break;
+                case "json":
+                    saveInventoryAsJSON(file);
+                    break;
             }
 
         }
@@ -378,44 +391,44 @@ public class MainWindowController implements Initializable {
 
     public String buildHTMLString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append(" <!DOCTYPE html>\n" +
+        buffer.append("<!DOCTYPE html>\n" +
             "<html>\n" +
-            "<style type=\"text/css\">\n" +
-            ".tg  {border-collapse:collapse;border-spacing:0;}\n" +
-            ".tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;\n" +
-            "  overflow:hidden;padding:10px 10px;word-break:normal;}\n" +
-            ".tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;\n" +
-            "  font-weight:normal;overflow:hidden;padding:10px 10px;word-break:normal;}\n" +
-            ".tg .tg-0lax{text-align:left;vertical-align:top}\n" +
-            "</style>\n" +
             "<head>\n" +
-            "<title>Assignment 5</title>\n" +
+            "  <title>OOP Assignment 5</title>" +
+            "<style>\n" +
+            "table {\n" +
+            "  font-family: arial, sans-serif;\n" +
+            "  border-collapse: collapse;\n" +
+            "  width: 40%;\n" +
+            "}\n" +
+            "\n" +
+            "td, th {\n" +
+            "  border: 1px solid #dddddd;\n" +
+            "  text-align: left;\n" +
+            "  padding: 8px;\n" +
+            "}\n" +
+            "</style>\n" +
             "</head>\n" +
             "<body>\n" +
-            "<h1>Inventory Tracker</h1>\n" +
-            "<table class=\"tg\">\n" +
-            "<thead>\n" +
+            "<h2>Inventory Tracker</h2>\n" +
+            "<table>\n" +
             "  <tr>\n" +
-            "   <th class=\"tg-0lax\">Serial Number</th>\n" +
-            "   <th class=\"tg-0lax\">Name<br></th>\n" +
-            "   <th class=\"tg-0lax\">Value</th>\n" +
-            "  </tr>\n" +
-            "</thead>\n" +
-            "<tbody>\n");
+            "    <th>Serial Number</th>\n" +
+            "    <th>Name</th>\n" +
+            "    <th>Value in dollars</th>\n" +
+            "  </tr>\n");
         for (int i = 0; i < itemModel.getItems().size(); i++) {
-            buffer.append("  <tr>\n    <td class=\"tg-0lax\">")
+            buffer.append("  <tr>\n    <td>")
                 .append(itemModel.getItems().get(i).getSerialNumber())
-                .append("</td>\n    <td class=\"tg-0lax\">")
+                .append("</td>\n    <td>")
                 .append(itemModel.getItems().get(i).getName())
-                .append("</td>\n    <td class=\"tg-0lax\">")
+                .append("</td>\n    <td>")
                 .append(itemModel.getItems().get(i).getValue())
-                .append("</td>\n  <tr>\n");
+                .append("</td>\n  </tr>\n");
         }
-        buffer.append(
-            "</tbody>\n" +
-                "</table>\n" +
-                "</body>\n" +
-                "</html> ");
+        buffer.append("</table>\n" +
+            "</body>\n" +
+            "</html>");
 
         String html = buffer.toString();
 
@@ -444,15 +457,14 @@ public class MainWindowController implements Initializable {
 
 
         File file = fileChooser.showOpenDialog(new Stage());
+        System.out.println(file);
         // save the chosen directory for next time
         fileChooser.setInitialDirectory(file.getParentFile());
 
         String fileName = file.getName();
-        String fileExtension = FilenameUtils.getExtension(fileName);
-
-        // For testing. Delete before final submission
-        System.out.println(file);
         System.out.println(fileName);
+
+        String fileExtension = FilenameUtils.getExtension(fileName);
         System.out.println(fileExtension);
 
         if (file != null) {
@@ -462,9 +474,15 @@ public class MainWindowController implements Initializable {
             List<Item> loadedList = new ArrayList<>();
 
             switch (fileExtension) {
-                case "txt" -> loadedList = loadInventoryAsTSV(file);
-                case "html" -> loadedList = loadInventoryAsHTML(file);
-                case "json" -> loadedList = loadInventoryAsJSON(file);
+                case "txt":
+                    loadedList = loadInventoryAsTSV(file);
+                    break;
+                case "html":
+                    loadedList = loadInventoryAsHTML(file);
+                    break;
+                case "json":
+                    loadedList = loadInventoryAsJSON(file);
+                    break;
             }
 
             // Add loaded Items from the file in the table
@@ -503,9 +521,89 @@ public class MainWindowController implements Initializable {
 
 
     public List<Item> loadInventoryAsHTML(File file) {
+        // Read html to String
+        String htmlString = getHTMLString(file);
 
-        return null;
+        // Read html to Document
+        Document htmlDoc = Jsoup.parse(htmlString);
+
+        Element table = htmlDoc.selectFirst("table");
+        Elements rows = table.select("tr");
+
+        System.out.println("Rows size " + rows.size());
+
+//        System.out.println(rows.get(1));
+//        System.out.println(rows.get(2));
+        Item tempItem;
+        List<Item> tempItemList = new ArrayList<>();
+        String[] fields = new String[3];
+        Double tmpPrice = null;
+
+        for(int i = 1; i < rows.size(); i++) { // skip first header row
+            Element row = rows.get(i);
+            System.out.println(row);
+            System.out.println("*********************************");
+            Elements cols = row.select("td");
+            for(int j = 0; j < cols.size(); j++) {
+                Element col = cols.get(j);
+//                System.out.println(col);
+//                System.out.println(col.text());
+                fields[j] = col.text();
+
+            }
+
+            // Add try/catch for any errors parsing the Item Price into Double
+            try {
+                tmpPrice = Double.parseDouble(fields[2]);
+            } catch (NumberFormatException e) {
+                System.out.println("Cannot parse into Double the String read from html file corresponding to price.");
+                e.printStackTrace();
+            }
+
+            // Create a new Item
+            tempItem = new Item(fields[0], fields[1], tmpPrice);
+
+            // Add Item to List
+            tempItemList.add(tempItem);
+
+//            System.out.println(fields[0]+" "+fields[1]+" "+fields[2]);
+////            System.out.println(cols);
+//            System.out.println("++++++++++++++++++++++++++++++++++");
+        }
+
+
+
+
+//        Item testItem = new Item("ABCDE12345", "TestingHTML", 3.99);
+//        tempItemList.add(testItem);
+
+        return tempItemList;
     }
+
+
+
+    public String getHTMLString(File file) {
+        // Read html file to String
+        StringBuilder htmlStr = new StringBuilder();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+
+            String currentLine;
+            while ((currentLine = br.readLine()) != null) {
+                htmlStr.append(currentLine);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        System.out.println(contentBuilder.toString());
+
+        return htmlStr.toString();
+    }
+
 
     public List<Item> loadInventoryAsJSON(File file) {
 
