@@ -5,6 +5,8 @@ package ucf.assignments;
  *  Copyright 2021 Edelis Molina
  */
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -13,16 +15,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.converter.DoubleStringConverter;
 import org.apache.commons.io.FilenameUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,9 +30,8 @@ import org.jsoup.select.Elements;
 
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 public class MainWindowController implements Initializable {
@@ -322,7 +320,6 @@ public class MainWindowController implements Initializable {
             new FileChooser.ExtensionFilter("Web Page", "*.html"),
             new FileChooser.ExtensionFilter("JSON (JavaScript Object Notation)", "*.json"));
 
-
         File file = fileChooser.showSaveDialog(new Stage());
         // save the chosen directory for next time
         fileChooser.setInitialDirectory(file.getParentFile());
@@ -347,7 +344,6 @@ public class MainWindowController implements Initializable {
                     saveInventoryAsJSON(file);
                     break;
             }
-
         }
     }
 
@@ -437,7 +433,31 @@ public class MainWindowController implements Initializable {
 
 
     public void saveInventoryAsJSON(File file) {
+        String jsonString = getJSONString();
 
+        // create a writer
+        try {
+            BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
+            outWriter.write(jsonString);
+            outWriter.close();
+
+        } catch (IOException e) {
+            System.out.println("A writing error has occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    public String getJSONString() {
+        // Custom decoder to make the Observables work with Gson
+
+        List<JsonItem> items = new ArrayList<>();
+        for(int i = 0; i < itemModel.getItems().size(); i++) {
+            items.add(new JsonItem(itemModel.getItems().get(i).getSerialNumber(), itemModel.getItems().get(i).getName(), itemModel.getItems().get(i).getValue()));
+        }
+
+        String json = new Gson().toJson(items);
+
+        return json;
     }
 
     // End of Save as ---------------------------------------------------------------------------------
@@ -522,7 +542,7 @@ public class MainWindowController implements Initializable {
 
     public List<Item> loadInventoryAsHTML(File file) {
         // Read html to String
-        String htmlString = getHTMLString(file);
+        String htmlString = readHTMLString(file);
 
         // Read html to Document
         Document htmlDoc = Jsoup.parse(htmlString);
@@ -530,26 +550,19 @@ public class MainWindowController implements Initializable {
         Element table = htmlDoc.selectFirst("table");
         Elements rows = table.select("tr");
 
-        System.out.println("Rows size " + rows.size());
-
-//        System.out.println(rows.get(1));
-//        System.out.println(rows.get(2));
         Item tempItem;
         List<Item> tempItemList = new ArrayList<>();
         String[] fields = new String[3];
         Double tmpPrice = null;
 
         for(int i = 1; i < rows.size(); i++) { // skip first header row
+            // Get each Row
             Element row = rows.get(i);
-            System.out.println(row);
-            System.out.println("*********************************");
             Elements cols = row.select("td");
             for(int j = 0; j < cols.size(); j++) {
+                // Get each Column of a Row
                 Element col = cols.get(j);
-//                System.out.println(col);
-//                System.out.println(col.text());
                 fields[j] = col.text();
-
             }
 
             // Add try/catch for any errors parsing the Item Price into Double
@@ -565,24 +578,14 @@ public class MainWindowController implements Initializable {
 
             // Add Item to List
             tempItemList.add(tempItem);
-
-//            System.out.println(fields[0]+" "+fields[1]+" "+fields[2]);
-////            System.out.println(cols);
-//            System.out.println("++++++++++++++++++++++++++++++++++");
         }
-
-
-
-
-//        Item testItem = new Item("ABCDE12345", "TestingHTML", 3.99);
-//        tempItemList.add(testItem);
 
         return tempItemList;
     }
 
 
 
-    public String getHTMLString(File file) {
+    public String readHTMLString(File file) {
         // Read html file to String
         StringBuilder htmlStr = new StringBuilder();
 
@@ -599,16 +602,46 @@ public class MainWindowController implements Initializable {
             e.printStackTrace();
         }
 
-//        System.out.println(contentBuilder.toString());
-
         return htmlStr.toString();
     }
 
 
     public List<Item> loadInventoryAsJSON(File file) {
 
-        return null;
+        // Read json to String
+        String jsonString = readJSONtoString(file);
+
+        Type jsonItemType = new TypeToken<ArrayList<JsonItem>>(){}.getType();
+
+        List<JsonItem> jsonItems = new Gson().fromJson(jsonString, jsonItemType);
+
+        // Convert List to Observable
+        List<Item> temp = new ArrayList<>();
+        for(int i = 0; i < jsonItems.size(); i++){
+            temp.add(new Item(jsonItems.get(i).getsNumber(), jsonItems.get(i).getName(), jsonItems.get(i).getPrice()));
+        }
+
+        return temp;
     }
 
+    public String readJSONtoString(File file) {
+        // Read html file to String
+        StringBuilder jsonStr = new StringBuilder();
 
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+
+            String currentLine;
+            while ((currentLine = br.readLine()) != null) {
+                jsonStr.append(currentLine);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(jsonStr.toString());
+        return jsonStr.toString();
+    }
 }

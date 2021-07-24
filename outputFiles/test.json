@@ -1,0 +1,22 @@
+[
+  {
+    "sNumber": "AXB124AXYE",
+    "name": "Xbox One",
+    "price": 399.0
+  },
+  {
+    "sNumber": "S40AZBDE4E",
+    "name": "Samsung TV",
+    "price": 599.99
+  },
+  {
+    "sNumber": "ABCDE12345",
+    "name": "iPad Pro",
+    "price": 999.99
+  },
+  {
+    "sNumber": "ABX4H321SW",
+    "name": "Microsoft Surface",
+    "price": 499.9945
+  }
+]
