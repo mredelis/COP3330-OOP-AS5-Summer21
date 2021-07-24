@@ -9,6 +9,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class InventoryManager extends Application {
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.setTitle("Inventory Tracker Application");
+            primaryStage.getIcons().add(new Image("ucf/assignments/index.png"));
             primaryStage.show();
 
         } catch (IOException e) {
