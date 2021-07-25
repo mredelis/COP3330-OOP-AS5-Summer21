@@ -59,7 +59,7 @@ public class MainWindowController implements Initializable {
     public MainWindowController() {
         this.itemModel = new ItemModel();
         this.fileChooser = new FileChooser();
-        this.fileChooser = new FileChooser();
+        this.fileManager = new FileManager();
     }
 
     @Override
@@ -477,147 +477,17 @@ public class MainWindowController implements Initializable {
 
         switch (fileExtension) {
             case "txt":
-                loadedList = loadInventoryAsTSV(file);
+                loadedList = fileManager.loadInventoryAsTSV(file);
                 break;
             case "html":
-                loadedList = loadInventoryAsHTML(file);
+                loadedList = fileManager.loadInventoryAsHTML(file);
                 break;
             case "json":
-                loadedList = loadInventoryAsJSON(file);
+                loadedList = fileManager.loadInventoryAsJSON(file);
                 break;
         }
 
         // Add loaded Items from the file in the table
         itemModel.getItems().addAll(FXCollections.observableArrayList(loadedList));
-    }
-
-
-    public List<Item> loadInventoryAsTSV(File file) {
-        List<Item> tempItemList = new ArrayList<>();
-        String[] fields;
-        Double priceField = null;
-
-        try {
-            Scanner scanner = new Scanner(file);
-            while (scanner.hasNextLine()) {
-                fields = scanner.nextLine().split("\t");
-
-                try {
-                    priceField = Double.parseDouble(fields[2]);
-                } catch (NumberFormatException e) {
-                    System.out.println(fields[2] + "cannot be parsed into a Double");
-                    e.printStackTrace();
-                }
-
-                // Create an Item and add the newly created Item to a List of Items
-                tempItemList.add(new Item(fields[0], fields[1], priceField));
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println(file + " was not found.");
-            e.printStackTrace();
-        }
-
-        return tempItemList;
-    }
-
-
-    public List<Item> loadInventoryAsHTML(File file) {
-        // Read html to String
-        String htmlString = readHTMLString(file);
-
-        // Read html to Document
-        Document htmlDoc = Jsoup.parse(htmlString);
-
-        Element table = htmlDoc.selectFirst("table");
-        Elements rows = table.select("tr");
-
-        Item tempItem;
-        List<Item> tempItemList = new ArrayList<>();
-        String[] fields = new String[3];
-        Double tmpPrice = null;
-
-        for(int i = 1; i < rows.size(); i++) { // skip first header row
-            // Get each Row
-            Element row = rows.get(i);
-            Elements cols = row.select("td");
-            for(int j = 0; j < cols.size(); j++) {
-                // Get each Column of a Row
-                Element col = cols.get(j);
-                fields[j] = col.text();
-            }
-
-            // Add try/catch for any errors parsing the Item Price into Double
-            try {
-                tmpPrice = Double.parseDouble(fields[2]);
-            } catch (NumberFormatException e) {
-                System.out.println("Cannot parse into Double the String read from html file corresponding to price.");
-                e.printStackTrace();
-            }
-
-            // Create a new Item
-            tempItem = new Item(fields[0], fields[1], tmpPrice);
-
-            // Add Item to List
-            tempItemList.add(tempItem);
-        }
-
-        return tempItemList;
-    }
-
-
-
-    public String readHTMLString(File file) {
-        // Read html file to String
-        StringBuilder htmlStr = new StringBuilder();
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-
-            String currentLine;
-            while ((currentLine = br.readLine()) != null) {
-                htmlStr.append(currentLine);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return htmlStr.toString();
-    }
-
-
-    public List<Item> loadInventoryAsJSON(File file) {
-
-        // Read json to String
-        String jsonString = readJSONtoString(file);
-
-        Type jsonItemType = new TypeToken<ArrayList<JsonItem>>(){}.getType();
-
-        List<JsonItem> jsonItems = new Gson().fromJson(jsonString, jsonItemType);
-
-        // Convert List to Observable
-        List<Item> temp = new ArrayList<>();
-        for(int i = 0; i < jsonItems.size(); i++){
-            temp.add(new Item(jsonItems.get(i).getsNumber(), jsonItems.get(i).getName(), jsonItems.get(i).getPrice()));
-        }
-
-        return temp;
-    }
-
-    public String readJSONtoString(File file) {
-        // Read html file to String
-        StringBuilder jsonStr = new StringBuilder();
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-
-            String currentLine;
-            while ((currentLine = br.readLine()) != null) {
-                jsonStr.append(currentLine);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return jsonStr.toString();
     }
 }
