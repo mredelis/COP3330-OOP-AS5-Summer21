@@ -184,13 +184,13 @@ public class MainWindowController implements Initializable {
     void deleteSelectedItemButtonClicked() {
         if (!itemModel.getItems().isEmpty()) {
             Item selectedItem = tableView.getSelectionModel().getSelectedItem();
-            deleteItem(selectedItem);
+            deleteItem(itemModel, selectedItem);
             tableView.getSelectionModel().clearSelection();
         }
     }
 
-    public void deleteItem(Item selectedItem) {
-        itemModel.getItems().remove(selectedItem);
+    public void deleteItem(ItemModel itemModelTemp, Item selectedItem) {
+        itemModelTemp.getItems().remove(selectedItem);
     }
 
 
