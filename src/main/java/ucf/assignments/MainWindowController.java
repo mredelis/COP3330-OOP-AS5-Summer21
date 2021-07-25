@@ -43,7 +43,7 @@ public class MainWindowController implements Initializable {
     @FXML private TextField itemNameTextField;
     @FXML private TextField itemValueTextField;
     @FXML private Button deleteSelectedItemButton;
-    @FXML private Button updateSelectedItemButton;
+    @FXML private Button editSelectedItemButton;
     @FXML private Label serialNumErrorLabel;
     @FXML private Label nameErrorLabel;
     @FXML private Label priceErrorLabel;
@@ -79,7 +79,7 @@ public class MainWindowController implements Initializable {
 
         // Bind Delete & Update Buttons to selection of the table. Delete and Update Buttons will be disable is no row is selected
         deleteSelectedItemButton.disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
-        updateSelectedItemButton.disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
+        editSelectedItemButton.disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
 
         // load dummy data for testing
         try {
@@ -152,8 +152,9 @@ public class MainWindowController implements Initializable {
 
         if (validInput) {
 
-            Item item = addItem(serialNumText, nameText, price);
-            itemModel.getItems().add(item);
+//            Item item = addItem(serialNumText, nameText, price);
+            addItem(itemModel, serialNumText, nameText, price);
+//            itemModel.getItems().add(item);
 
             itemSerialNumberTextField.setPromptText("Item Serial Number");
             itemSerialNumberTextField.clear();
@@ -166,8 +167,9 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    public Item addItem(String serialNumber, String name, Double price) {
-        return new Item(serialNumber, name, price);
+    public void addItem(ItemModel itemModelTemp, String serialNumber, String name, Double price) {
+        itemModelTemp.getItems().add(new Item(serialNumber, name, price));
+//        return new Item(serialNumber, name, price);
     }
 
     private void errorMessage(String contentText) {
@@ -193,7 +195,7 @@ public class MainWindowController implements Initializable {
 
 
     @FXML
-    void updateSelectedItemButtonClicked() throws IOException {
+    void editSelectedItemButtonClicked() throws IOException {
         // Get selected Item
         Item selectedItem = tableView.getSelectionModel().getSelectedItem();
         int index = tableView.getSelectionModel().getSelectedIndex();
@@ -218,7 +220,6 @@ public class MainWindowController implements Initializable {
         secondaryStage.showAndWait();
 
         tableView.getItems().set(index, selectedItem);
-
     }
 
 
@@ -280,7 +281,6 @@ public class MainWindowController implements Initializable {
                     break;
             }
         }
-
     }
 
 

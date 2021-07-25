@@ -13,32 +13,19 @@ class MainWindowController {
     + MainWindowController(ItemModel, SceneManager)
 
     addItemButtonClicked(EventHandler)
-    editItemButtonClicked(EventHandler)
+    + addItem(String, String, Double)
+
     deleteSelectedItemButtonClicked(EventHandler)
+    + deleteItem()
+
+    editSelectedItemButtonClicked(EventHandler)
+    + UpdateItemController(ItemModel: itemModel, Item: selectedItem)
+
+    + filterList(searchText: String)
+    + searchFindsItem(item: Item, searchText: String)
 
     menuItemSaveAsClicked(EventHandler)
-    saveInventoryAsTSV(filename: String)
-    saveInventoryAsHTML(filename: String)
-    saveInventoryAsJSON(filename: String)
-
     menuItemOpenFileClicked(EventHandler)
-    loadInventoryAsTSV(filename: String)
-    loadInventoryAsHTML(filename: String)
-    loadInventoryAsJSON(filename: String)
-
-    addItem(String, String, Double)
-    deleteItem()
-    editItem()
-
-    saveInventoryAsTSV(filename: String)
-    saveInventoryAsHTML(filename: String)
-    saveInventoryAsJSON(filename: String)
-}
-
-class FileManager {
-    saveAsTSV(filename: String, data: String)
-    saveAsJSON(filename: String, data: String)
-    saveAsHTML(filename: String, data: String)
 }
 
 class UpdateItemWindowController {
@@ -48,7 +35,17 @@ class UpdateItemWindowController {
 
     updateItemButtonClicked(EventHandler)
     + editItem(serialNumber: String, name: String, price: Double)
+}
 
+class FileManager {
+
+    + saveInventoryAsTSV(filename: String, ItemModel: itemModel)
+    + saveInventoryAsHTML(filename: String, ItemModel: itemModel)
+    + saveInventoryAsJSON(filename: String, ItemModel: itemModel)
+
+    + loadInventoryAsTSV(filename: String)
+    + loadInventoryAsHTML(filename: String)
+    + loadInventoryAsJSON(filename: String)
 }
 
 class InputValidator {
@@ -56,7 +53,6 @@ class InputValidator {
     + isValidSerialNumber(serialNumber: String)
     + containsSerialNumber(itemModel: ItemModel, serialNumber: String)
 }
-
 
 class ItemModel {
     - ObservableList<Item>

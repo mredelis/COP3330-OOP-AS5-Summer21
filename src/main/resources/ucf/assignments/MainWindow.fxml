@@ -94,7 +94,7 @@
                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                     <children>
                         <Button fx:id="deleteSelectedItemButton" mnemonicParsing="false" onAction="#deleteSelectedItemButtonClicked" prefHeight="35.0" prefWidth="180.0" text="Delete Selected Item" />
-            <Button fx:id="updateSelectedItemButton" mnemonicParsing="false" onAction="#updateSelectedItemButtonClicked" prefWidth="180.0" text="Update Selected Item" />
+            <Button fx:id="editSelectedItemButton" mnemonicParsing="false" onAction="#editSelectedItemButtonClicked" prefWidth="180.0" text="Edit Selected Item" />
                     </children>
                 </HBox>
             <padding>
