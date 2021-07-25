@@ -24,7 +24,7 @@
 /* TABLEVIEW */
 .table-view {
     -fx-control-inner-background: #f0f1f1;
-    -fx-background-color: accent-color;
+    -fx-background-color: #f0f1f1;
 }
 
 .table-view .column-header-background {
@@ -37,8 +37,8 @@
 }
 
 .table-view .column-header .label {
-    -fx-font-size: 14pt;
-    -fx-font-family: "System";
+    -fx-font-size: 12pt;
+    -fx-font-family: "Arial";
     -fx-text-fill: #FFFFFF;
     -fx-alignment: center;
 
@@ -115,6 +115,6 @@
 }
 
 .transparent{
-   -fx-background-color: derive(light-primary-color,80%);
+   -fx-background-color: derive(light-primary-color,90%);
 }
 

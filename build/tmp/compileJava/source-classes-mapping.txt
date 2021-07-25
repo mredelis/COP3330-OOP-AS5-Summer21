@@ -6,11 +6,11 @@ ucf/assignments/UpdateItemController.java
  ucf.assignments.UpdateItemController
 ucf/assignments/Item.java
  ucf.assignments.Item
+ucf/assignments/InventoryManager.java
+ ucf.assignments.InventoryManager
+ucf/assignments/JsonItem.java
+ ucf.assignments.JsonItem
 ucf/assignments/MainWindowController.java
  ucf.assignments.MainWindowController
  ucf.assignments.MainWindowController$1
  ucf.assignments.MainWindowController$2
-ucf/assignments/JsonItem.java
- ucf.assignments.JsonItem
-ucf/assignments/InventoryManager.java
- ucf.assignments.InventoryManager

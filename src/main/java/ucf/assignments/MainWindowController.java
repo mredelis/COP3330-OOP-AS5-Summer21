@@ -38,43 +38,27 @@ public class MainWindowController implements Initializable {
 
     private ItemModel itemModel;
     private FileChooser fileChooser;
+    private FileManager fileManager;
 
-    @FXML
-    private TextField searchTextField;
-    @FXML
-    private Button searchButton;
-    @FXML
-    private TableView<Item> tableView;
-    @FXML
-    private TableColumn<Item, String> itemSerialNumberColumn;
-    @FXML
-    private TableColumn<Item, String> itemNameColumn;
-    @FXML
-    private TableColumn<Item, Double> itemValueColumn;
-    @FXML
-    private TextField itemSerialNumberTextField;
-    @FXML
-    private TextField itemNameTextField;
-    @FXML
-    private TextField itemValueTextField;
-    @FXML
-    private Button addNewItemButton;
-    @FXML
-    private Button deleteSelectedItemButton;
-    @FXML
-    private Button updateSelectedItemButton;
-    @FXML
-    private Label serialNumErrorLabel;
-    @FXML
-    private Label nameErrorLabel;
-    @FXML
-    private Label priceErrorLabel;
-    @FXML
-    private MenuBar menuBar;
+    @FXML private TextField searchTextField;
+    @FXML private TableView<Item> tableView;
+    @FXML private TableColumn<Item, String> itemSerialNumberColumn;
+    @FXML private TableColumn<Item, String> itemNameColumn;
+    @FXML private TableColumn<Item, Double> itemValueColumn;
+    @FXML private TextField itemSerialNumberTextField;
+    @FXML private TextField itemNameTextField;
+    @FXML private TextField itemValueTextField;
+    @FXML private Button deleteSelectedItemButton;
+    @FXML private Button updateSelectedItemButton;
+    @FXML private Label serialNumErrorLabel;
+    @FXML private Label nameErrorLabel;
+    @FXML private Label priceErrorLabel;
+    @FXML private MenuBar menuBar;
 
 
     public MainWindowController() {
         this.itemModel = new ItemModel();
+        this.fileChooser = new FileChooser();
         this.fileChooser = new FileChooser();
     }
 
@@ -85,13 +69,8 @@ public class MainWindowController implements Initializable {
         itemNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         itemValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
 
-        // Allow for the table fields to be editable
-//        tableView.setEditable(true);
-//        itemSerialNumberColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-//        itemNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-//        itemValueColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
-
-        itemValueColumn.setCellFactory(tc -> new TableCell<Item, Double>() {
+        // Display formatted item price in tableView
+        itemValueColumn.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(Double value, boolean empty) {
                 super.updateItem(value, empty);
@@ -103,7 +82,7 @@ public class MainWindowController implements Initializable {
             }
         });
 
-        // Bind Delete & Update buttons to selection of the table. Delete and Update buttons will be disable is no row is selected
+        // Bind Delete & Update Buttons to selection of the table. Delete and Update Buttons will be disable is no row is selected
         deleteSelectedItemButton.disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
         updateSelectedItemButton.disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
 
@@ -117,15 +96,24 @@ public class MainWindowController implements Initializable {
             e.printStackTrace();
         }
 
-        searchTextField.textProperty().addListener((observable, oldValue, newValue) ->
+        // Defining a method inside the ChangeListener of the searchTextField to update the search every time the user
+        // enters or edits the search
+        // newValue is the text currently in the searchTextField
+         searchTextField.textProperty().addListener((observable, oldValue, newValue) ->
             tableView.setItems(filterList(newValue))
         );
 
     }
 
+    @FXML
+    void clearSearchButtonClicked(ActionEvent event) {
+        searchTextField.setText("");
+        event.consume();
+    }
+
 
     @FXML
-    void addNewItemButtonClicked(ActionEvent event) {
+    void addNewItemButtonClicked() {
         serialNumErrorLabel.setVisible(false);
         nameErrorLabel.setVisible(false);
         priceErrorLabel.setVisible(false);
@@ -211,7 +199,7 @@ public class MainWindowController implements Initializable {
     }
 
     @FXML
-    void deleteSelectedItemButtonClicked(ActionEvent event) {
+    void deleteSelectedItemButtonClicked() {
         if (!itemModel.getItems().isEmpty()) {
             Item selectedItem = tableView.getSelectionModel().getSelectedItem();
             deleteItem(selectedItem);
@@ -225,7 +213,7 @@ public class MainWindowController implements Initializable {
 
 
     @FXML
-    void menuItemQuitClicked(ActionEvent event) {
+    void menuItemQuitClicked() {
         Alert exitAlert = new Alert(Alert.AlertType.CONFIRMATION);
         Stage stage = (Stage) menuBar.getScene().getWindow();
         exitAlert.setTitle("Exit Application");
@@ -242,7 +230,7 @@ public class MainWindowController implements Initializable {
     }
 
     @FXML
-    void menuItemGetHelpClicked(ActionEvent event) {
+    void menuItemGetHelpClicked() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Get Help");
         alert.setHeaderText("Refer to file README.md in the GitHub Repository for the project");
@@ -262,7 +250,7 @@ public class MainWindowController implements Initializable {
     }
 
     @FXML
-    void updateSelectedItemButtonClicked(ActionEvent event) throws IOException {
+    void updateSelectedItemButtonClicked() throws IOException {
         // Get selected Item
         Item selectedItem = tableView.getSelectionModel().getSelectedItem();
         int index = tableView.getSelectionModel().getSelectedIndex();
@@ -290,7 +278,9 @@ public class MainWindowController implements Initializable {
     }
 
 
-    // Search ---------------------------------------------------------------------------
+    /* METHODS TO AID SEARCH */
+
+    // Loop through an ObservableList<Item> and create a new ObservableList<Item> with the items that match the searchText
     public ObservableList<Item> filterList(String searchText) {
         List<Item> filteredList = new ArrayList<>();
 
@@ -303,16 +293,17 @@ public class MainWindowController implements Initializable {
     }
 
 
+    // Return if an Item's Name or Serial Number contains the searchText
     public boolean searchFindsItem(Item item, String searchText) {
         return (item.getName().toLowerCase().contains(searchText.toLowerCase()) ||
             item.getSerialNumber().toLowerCase().contains(searchText.toLowerCase()));
     }
-    // End of Search ---------------------------------------------------------------------------
+
 
 
     // Save as ---------------------------------------------------------------------------------
     @FXML
-    void menuItemSaveAsClicked(ActionEvent event) {
+    void menuItemSaveAsClicked() {
 
         fileChooser.setTitle("Save As");
         fileChooser.getExtensionFilters().addAll(
@@ -327,23 +318,16 @@ public class MainWindowController implements Initializable {
         String fileName = file.getName();
         String fileExtension = FilenameUtils.getExtension(fileName);
 
-        // For testing. Delete before final submission
-        System.out.println(file);
-        System.out.println(fileName);
-        System.out.println(fileExtension);
-
-        if (file != null) {
-            switch (fileExtension) {
-                case "txt":
-                    saveInventoryAsTSV(file);
-                    break;
-                case "html":
-                    saveInventoryAsHTML(file);
-                    break;
-                case "json":
-                    saveInventoryAsJSON(file);
-                    break;
-            }
+        switch (fileExtension) {
+            case "txt":
+                saveInventoryAsTSV(file);
+                break;
+            case "html":
+                saveInventoryAsHTML(file);
+                break;
+            case "json":
+                saveInventoryAsJSON(file);
+                break;
         }
     }
 
@@ -387,32 +371,33 @@ public class MainWindowController implements Initializable {
 
     public String buildHTMLString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("<!DOCTYPE html>\n" +
-            "<html>\n" +
-            "<head>\n" +
-            "  <title>OOP Assignment 5</title>" +
-            "<style>\n" +
-            "table {\n" +
-            "  font-family: arial, sans-serif;\n" +
-            "  border-collapse: collapse;\n" +
-            "  width: 40%;\n" +
-            "}\n" +
-            "\n" +
-            "td, th {\n" +
-            "  border: 1px solid #dddddd;\n" +
-            "  text-align: left;\n" +
-            "  padding: 8px;\n" +
-            "}\n" +
-            "</style>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "<h2>Inventory Tracker</h2>\n" +
-            "<table>\n" +
-            "  <tr>\n" +
-            "    <th>Serial Number</th>\n" +
-            "    <th>Name</th>\n" +
-            "    <th>Value in dollars</th>\n" +
-            "  </tr>\n");
+        buffer.append("""
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <title>OOP Assignment 5</title><style>
+            table {
+              font-family: arial, sans-serif;
+              border-collapse: collapse;
+              width: 40%;
+            }
+
+            td, th {
+              border: 1px solid #dddddd;
+              text-align: left;
+              padding: 8px;
+            }
+            </style>
+            </head>
+            <body>
+            <h2>Inventory Tracker</h2>
+            <table>
+              <tr>
+                <th>Serial Number</th>
+                <th>Name</th>
+                <th>Value in dollars</th>
+              </tr>
+            """);
         for (int i = 0; i < itemModel.getItems().size(); i++) {
             buffer.append("  <tr>\n    <td>")
                 .append(itemModel.getItems().get(i).getSerialNumber())
@@ -422,13 +407,12 @@ public class MainWindowController implements Initializable {
                 .append(itemModel.getItems().get(i).getValue())
                 .append("</td>\n  </tr>\n");
         }
-        buffer.append("</table>\n" +
-            "</body>\n" +
-            "</html>");
+        buffer.append("""
+            </table>
+            </body>
+            </html>""");
 
-        String html = buffer.toString();
-
-        return html;
+        return buffer.toString();
     }
 
 
@@ -455,9 +439,9 @@ public class MainWindowController implements Initializable {
             items.add(new JsonItem(itemModel.getItems().get(i).getSerialNumber(), itemModel.getItems().get(i).getName(), itemModel.getItems().get(i).getValue()));
         }
 
-        String json = new Gson().toJson(items);
+//        String json = new Gson().toJson(items);
 
-        return json;
+        return new Gson().toJson(items);
     }
 
     // End of Save as ---------------------------------------------------------------------------------
@@ -467,14 +451,13 @@ public class MainWindowController implements Initializable {
     //
     // Load as ---------------------------------------------------------------------------------
     @FXML
-    void menuItemOpenFileClicked(ActionEvent event) {
+    void menuItemOpenFileClicked() {
 
         fileChooser.setTitle("Open");
         fileChooser.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("Text (Tab delimited)", "*.txt"),
             new FileChooser.ExtensionFilter("Web Page", "*.html"),
             new FileChooser.ExtensionFilter("JSON (JavaScript Object Notation)", "*.json"));
-
 
         File file = fileChooser.showOpenDialog(new Stage());
         System.out.println(file);
@@ -487,27 +470,25 @@ public class MainWindowController implements Initializable {
         String fileExtension = FilenameUtils.getExtension(fileName);
         System.out.println(fileExtension);
 
-        if (file != null) {
-            // Remove previous Items from ItemModel
-            itemModel.getItems().clear();
+        // Remove previous Items from ItemModel
+        itemModel.getItems().clear();
 
-            List<Item> loadedList = new ArrayList<>();
+        List<Item> loadedList = new ArrayList<>();
 
-            switch (fileExtension) {
-                case "txt":
-                    loadedList = loadInventoryAsTSV(file);
-                    break;
-                case "html":
-                    loadedList = loadInventoryAsHTML(file);
-                    break;
-                case "json":
-                    loadedList = loadInventoryAsJSON(file);
-                    break;
-            }
-
-            // Add loaded Items from the file in the table
-            itemModel.getItems().addAll(FXCollections.observableArrayList(loadedList));
+        switch (fileExtension) {
+            case "txt":
+                loadedList = loadInventoryAsTSV(file);
+                break;
+            case "html":
+                loadedList = loadInventoryAsHTML(file);
+                break;
+            case "json":
+                loadedList = loadInventoryAsJSON(file);
+                break;
         }
+
+        // Add loaded Items from the file in the table
+        itemModel.getItems().addAll(FXCollections.observableArrayList(loadedList));
     }
 
 
@@ -596,8 +577,6 @@ public class MainWindowController implements Initializable {
             while ((currentLine = br.readLine()) != null) {
                 htmlStr.append(currentLine);
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -635,13 +614,10 @@ public class MainWindowController implements Initializable {
             while ((currentLine = br.readLine()) != null) {
                 jsonStr.append(currentLine);
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        System.out.println(jsonStr.toString());
         return jsonStr.toString();
     }
 }

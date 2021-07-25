@@ -5,5 +5,12 @@ package ucf.assignments;
  *  Copyright 2021 Edelis Molina
  */
 
+import java.io.File;
+import java.util.List;
+
 public class FileManager {
+
+//    public List<Item> loadInventoryAsTSV(File file){
+//
+//    }
 }
