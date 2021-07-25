@@ -6,7 +6,6 @@ package ucf.assignments;
  */
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -23,14 +22,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.io.FilenameUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.*;
 
@@ -320,136 +314,128 @@ public class MainWindowController implements Initializable {
 
         switch (fileExtension) {
             case "txt":
-                saveInventoryAsTSV(file);
+                fileManager.saveInventoryAsTSV(file, itemModel);
                 break;
             case "html":
-                saveInventoryAsHTML(file);
+                fileManager.saveInventoryAsHTML(file, itemModel);
                 break;
             case "json":
-                saveInventoryAsJSON(file);
+                fileManager.saveInventoryAsJSON(file, itemModel);
                 break;
         }
     }
 
-
-    public void saveInventoryAsTSV(File file) {
-
-        try {
-            // create a writer
-            BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
-
-            // Write one inventory Item per line and separate each field with a /t character
-            for (int i = 0; i < itemModel.getItems().size(); i++) {
-                outWriter.write(itemModel.getItems().get(i).convertItemToTSVString());
-                // New line for each Item
-                outWriter.newLine();
-            }
-
-            outWriter.close();
-
-        } catch (IOException e) {
-            System.out.println("A writing error has occurred.");
-            e.printStackTrace();
-        }
-    }
+//    public void writeToFile(File file, String string) {
+//        try {
+//            BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
+//            outWriter.write(string);
+//            outWriter.close();
+//
+//        } catch (IOException e) {
+//            System.out.println("A writing error has occurred.");
+//            e.printStackTrace();
+//        }
+//    }
 
 
-    public void saveInventoryAsHTML(File file) {
-        // Create html String
-        String htmlString = buildHTMLString();
-        // create a writer
-        try {
-            BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
-            outWriter.write(htmlString);
+//    public void saveInventoryAsTSV(File file, ItemModel itemModel) {
+//        // Create TSV String
+//        String tsvString = buildTSVString(itemModel);
+//
+//        // Call writer function
+//        writeToFile(file, tsvString);
+//    }
+//
+//
+//    public void saveInventoryAsHTML(File file, ItemModel itemModel) {
+//        // Create html String
+//        String htmlString = buildHTMLString(itemModel);
+//
+//        // Call write function
+//        writeToFile(file, htmlString);
+//    }
+//
+//    public void saveInventoryAsJSON(File file, ItemModel itemModel) {
+//        // Create json String
+//        String jsonString = buildJSONString(itemModel);
+//
+//        // Call write function
+//        writeToFile(file, jsonString);
+//    }
 
-            outWriter.close();
-        } catch (IOException e) {
-            System.out.println("A writing error has occurred.");
-            e.printStackTrace();
-        }
-    }
+//
+//    public String buildTSVString(ItemModel itemModel) {
+//        StringBuilder buffer = new StringBuilder();
+//
+//        // Write one inventory Item per line and separate each field with a /t character
+//        for(int i = 0; i < itemModel.getItems().size(); i++) {
+//            buffer.append(itemModel.getItems().get(i).convertItemToTSVString());
+//            // New line for each Item
+//            buffer.append(System.lineSeparator());
+//        }
+//        return buffer.toString();
+//    }
+//
+//    public String buildHTMLString(ItemModel itemModel) {
+//        StringBuilder buffer = new StringBuilder();
+//        buffer.append("""
+//            <!DOCTYPE html>
+//            <html>
+//            <head>
+//              <title>OOP Assignment 5</title><style>
+//            table {
+//              font-family: arial, sans-serif;
+//              border-collapse: collapse;
+//              width: 40%;
+//            }
+//
+//            td, th {
+//              border: 1px solid #dddddd;
+//              text-align: left;
+//              padding: 8px;
+//            }
+//            </style>
+//            </head>
+//            <body>
+//            <h2>Inventory Tracker</h2>
+//            <table>
+//              <tr>
+//                <th>Serial Number</th>
+//                <th>Name</th>
+//                <th>Value in dollars</th>
+//              </tr>
+//            """);
+//        for (int i = 0; i < itemModel.getItems().size(); i++) {
+//            buffer.append("  <tr>\n    <td>")
+//                .append(itemModel.getItems().get(i).getSerialNumber())
+//                .append("</td>\n    <td>")
+//                .append(itemModel.getItems().get(i).getName())
+//                .append("</td>\n    <td>")
+//                .append(itemModel.getItems().get(i).getValue())
+//                .append("</td>\n  </tr>\n");
+//        }
+//        buffer.append("""
+//            </table>
+//            </body>
+//            </html>""");
+//
+//        return buffer.toString();
+//    }
+//
+//    public String buildJSONString(ItemModel itemModel) {
+//        // Custom decoder to make the Observables work with Gson
+//
+//        List<JsonItem> items = new ArrayList<>();
+//        for(int i = 0; i < itemModel.getItems().size(); i++) {
+//            items.add(new JsonItem(itemModel.getItems().get(i).getSerialNumber(), itemModel.getItems().get(i).getName(), itemModel.getItems().get(i).getValue()));
+//        }
+////        String json = new Gson().toJson(items);
+//        return new Gson().toJson(items);
+//    }
 
-    public String buildHTMLString() {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("""
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <title>OOP Assignment 5</title><style>
-            table {
-              font-family: arial, sans-serif;
-              border-collapse: collapse;
-              width: 40%;
-            }
-
-            td, th {
-              border: 1px solid #dddddd;
-              text-align: left;
-              padding: 8px;
-            }
-            </style>
-            </head>
-            <body>
-            <h2>Inventory Tracker</h2>
-            <table>
-              <tr>
-                <th>Serial Number</th>
-                <th>Name</th>
-                <th>Value in dollars</th>
-              </tr>
-            """);
-        for (int i = 0; i < itemModel.getItems().size(); i++) {
-            buffer.append("  <tr>\n    <td>")
-                .append(itemModel.getItems().get(i).getSerialNumber())
-                .append("</td>\n    <td>")
-                .append(itemModel.getItems().get(i).getName())
-                .append("</td>\n    <td>")
-                .append(itemModel.getItems().get(i).getValue())
-                .append("</td>\n  </tr>\n");
-        }
-        buffer.append("""
-            </table>
-            </body>
-            </html>""");
-
-        return buffer.toString();
-    }
 
 
-    public void saveInventoryAsJSON(File file) {
-        String jsonString = getJSONString();
-
-        // create a writer
-        try {
-            BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
-            outWriter.write(jsonString);
-            outWriter.close();
-
-        } catch (IOException e) {
-            System.out.println("A writing error has occurred.");
-            e.printStackTrace();
-        }
-    }
-
-    public String getJSONString() {
-        // Custom decoder to make the Observables work with Gson
-
-        List<JsonItem> items = new ArrayList<>();
-        for(int i = 0; i < itemModel.getItems().size(); i++) {
-            items.add(new JsonItem(itemModel.getItems().get(i).getSerialNumber(), itemModel.getItems().get(i).getName(), itemModel.getItems().get(i).getValue()));
-        }
-
-//        String json = new Gson().toJson(items);
-
-        return new Gson().toJson(items);
-    }
-
-    // End of Save as ---------------------------------------------------------------------------------
-    //
-    //
-    //
-    //
-    // Load as ---------------------------------------------------------------------------------
+    /* LOAD A TSV, HTML OR JSON FILES */
     @FXML
     void menuItemOpenFileClicked() {
 
@@ -465,10 +451,10 @@ public class MainWindowController implements Initializable {
         fileChooser.setInitialDirectory(file.getParentFile());
 
         String fileName = file.getName();
-        System.out.println(fileName);
+//        System.out.println(fileName);
 
         String fileExtension = FilenameUtils.getExtension(fileName);
-        System.out.println(fileExtension);
+//        System.out.println(fileExtension);
 
         // Remove previous Items from ItemModel
         itemModel.getItems().clear();
