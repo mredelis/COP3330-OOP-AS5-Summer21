@@ -1,5 +1,7 @@
 package ucf.assignments;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.junit.Before;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +53,27 @@ class InputValidatorTest {
     }
 
     @Test
+    @DisplayName("Duplicated Serial Number Validation")
     void containsSerialNumberTest() {
+        InputValidator inputValidator = new InputValidator();
 
+        // Create ObservableList<Item>
+        ObservableList<Item> items = FXCollections.observableArrayList();
+        items.add(new Item("AXB124AXYE", "Xbox One", 399.00));
+        items.add(new Item("S40AZBDE4E", "Samsung TV", 599.99));
+        items.add(new Item("ABCDE12345", "iPad Pro", 999.99));
+        items.add(new Item("ABX4H321SW", "Microsoft Surface", 499.9945));
+
+        ItemModel itemModel = new ItemModel();
+        itemModel.getItems().addAll(items);
+
+        // Contains the below serial #s
+        assertTrue(inputValidator.containsSerialNumber(itemModel, "AXB124AXYE"));
+        assertTrue(inputValidator.containsSerialNumber(itemModel, "S40AZBDE4E"));
+        assertTrue(inputValidator.containsSerialNumber(itemModel, "ABCDE12345"));
+        assertTrue(inputValidator.containsSerialNumber(itemModel, "ABX4H321SW"));
+
+        // Does not contain the below serial #
+        assertFalse(inputValidator.containsSerialNumber(itemModel, "QWERTY1234"));
     }
 }

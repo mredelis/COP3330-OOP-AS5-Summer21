@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -117,7 +116,6 @@ public class UpdateItemController implements Initializable {
         }
     }
 
-
     public void editItem(String serialNumber, String name, Double price) {
         selectedItem.setSerialNumber(serialNumber);
         selectedItem.setName(name);
@@ -132,7 +130,6 @@ public class UpdateItemController implements Initializable {
         alert.setContentText(contentText);
         alert.showAndWait();
     }
-
 }
 
 

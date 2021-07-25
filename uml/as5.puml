@@ -42,6 +42,13 @@ class FileManager {
 }
 
 class UpdateItemWindowController {
+    - itemModel: ItemModel
+    - selectedItem: Item
+    - inValidator: InputValidator
+
+    updateItemButtonClicked(EventHandler)
+    + editItem(serialNumber: String, name: String, price: Double)
+
 }
 
 class InputValidator {
@@ -57,6 +64,8 @@ class ItemModel {
     /' ObservableList is not serializable
        Copying everything over a normal list
        Use Gson on that normal list '/
+
+     + getItems()
 }
 
 class Item {
@@ -70,6 +79,7 @@ class Item {
     + setSerialNumber()
     + getValue()
     + setValue()
+    + convertItemToTSVString()
 }
 
 openjfx.org.Application <|-- InventoryTracker
