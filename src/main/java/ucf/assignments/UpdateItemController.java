@@ -7,18 +7,14 @@ package ucf.assignments;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -26,11 +22,11 @@ public class UpdateItemController implements Initializable {
 
     private ItemModel itemModel;
     private Item selectedItem;
+    private InputValidator inValidator;
 
     @FXML private TextField updateSerialNumberTextField;
     @FXML private TextField updateNameTextField;
     @FXML private TextField updateValueTextField;
-    @FXML private Button updateItemButton;
     @FXML private Label updateSerialNumErrorLabel;
     @FXML private Label updateNameErrorLabel;
     @FXML private Label updatePriceErrorLabel;
@@ -38,6 +34,7 @@ public class UpdateItemController implements Initializable {
     public UpdateItemController(ItemModel itemModel, Item selectedItem) {
         this.itemModel = itemModel;
         this.selectedItem = selectedItem;
+        this.inValidator = new InputValidator();
     }
 
 
@@ -68,22 +65,35 @@ public class UpdateItemController implements Initializable {
             validInput = false;
 
         } else {
-            if (nameText.length() < 2 || nameText.length() > 256) {
+            if (!inValidator.isValidName(nameText)) {
                 updateNameErrorLabel.setVisible(true);
                 updateNameErrorLabel.setText("Item name must be between 2 and 256 characters.");
-                updateNameTextField.clear();
+
+                updateNameTextField.setText(selectedItem.getName());
+                updateNameTextField.requestFocus();
+
                 validInput = false;
             }
 
-            if (!(serialNumText.matches("[0-9A-Z]+") && serialNumText.length() == 10)) {
+            if (!inValidator.isValidSerialNumber(serialNumText)) {
                 updateSerialNumErrorLabel.setVisible(true);
                 updateSerialNumErrorLabel.setText("Invalid Serial Number.");
-                updateSerialNumberTextField.clear();
+
+                updateSerialNumberTextField.setText(selectedItem.getSerialNumber());
+                updateSerialNumberTextField.requestFocus();
+
                 validInput = false;
-            } else if (containsSerialNumber(serialNumText)) {
-                errorMessage("Serial number already exists.");
-                updateSerialNumberTextField.clear();
-                validInput = false;
+            }
+
+            if (!serialNumText.equalsIgnoreCase(selectedItem.getSerialNumber())) {
+
+                if (inValidator.containsSerialNumber(itemModel, serialNumText)) {
+                    errorMessage("Serial number already exists.");
+                    updateSerialNumberTextField.setText(selectedItem.getSerialNumber());
+                    updateSerialNumberTextField.requestFocus();
+
+                    validInput = false;
+                }
             }
 
             try {
@@ -97,13 +107,8 @@ public class UpdateItemController implements Initializable {
         }
 
         if (validInput) {
-            editItem(serialNumText, nameText, price);
 
-            System.out.println("This is the modified list");
-            for(int i = 0; i < itemModel.getItems().size(); i++) {
-                System.out.print(itemModel.getItems().get(i).getSerialNumber() + " " + itemModel.getItems().get(i).getName() + " " + itemModel.getItems().get(i).getValue());
-                System.out.println();
-            }
+            editItem(serialNumText, nameText, price);
 
             // Change scene to tableView
             Node node = (Node) event.getSource();
@@ -120,15 +125,6 @@ public class UpdateItemController implements Initializable {
     }
 
 
-    public boolean containsSerialNumber(String serialNumText){
-        for(int i = 0; i < itemModel.getItems().size(); i++){
-            if(itemModel.getItems().get(i).getSerialNumber().equalsIgnoreCase(serialNumText)){
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void errorMessage(String contentText) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error Alert");
@@ -136,9 +132,6 @@ public class UpdateItemController implements Initializable {
         alert.setContentText(contentText);
         alert.showAndWait();
     }
-
-
-
 
 }
 

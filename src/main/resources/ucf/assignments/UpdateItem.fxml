@@ -16,7 +16,7 @@
             <TextField fx:id="updateSerialNumberTextField" prefWidth="170.0" promptText="Item Serial Number" />
             <TextField fx:id="updateNameTextField" prefWidth="340.0" promptText="Item Name" />
             <TextField fx:id="updateValueTextField" prefWidth="110.0" promptText="Item Price" />
-            <Button fx:id="updateItemButton" mnemonicParsing="false" onAction="#updateItemButtonClicked" text="Update Item" />
+            <Button mnemonicParsing="false" onAction="#updateItemButtonClicked" text="Update Item" />
          </children>
       </HBox>
       <HBox layoutX="30.0" layoutY="375.0" spacing="5.0">

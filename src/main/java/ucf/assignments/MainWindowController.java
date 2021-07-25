@@ -5,7 +5,6 @@ package ucf.assignments;
  *  Copyright 2021 Edelis Molina
  */
 
-import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -23,7 +22,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.io.FilenameUtils;
 
-
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -33,6 +31,7 @@ public class MainWindowController implements Initializable {
     private ItemModel itemModel;
     private FileChooser fileChooser;
     private FileManager fileManager;
+    private InputValidator inputValidator;
 
     @FXML private TextField searchTextField;
     @FXML private TableView<Item> tableView;
@@ -54,6 +53,7 @@ public class MainWindowController implements Initializable {
         this.itemModel = new ItemModel();
         this.fileChooser = new FileChooser();
         this.fileManager = new FileManager();
+        this.inputValidator = new InputValidator();
     }
 
     @Override
@@ -99,12 +99,6 @@ public class MainWindowController implements Initializable {
 
     }
 
-    @FXML
-    void clearSearchButtonClicked(ActionEvent event) {
-        searchTextField.setText("");
-        event.consume();
-    }
-
 
     @FXML
     void addNewItemButtonClicked() {
@@ -121,23 +115,24 @@ public class MainWindowController implements Initializable {
         if (serialNumText.isEmpty() || nameText.isEmpty() || itemValueTextField.getText().isEmpty()) {
             // Alert the user to enter information in all text fields
             errorMessage("All fields must be filled in to add a new item.");
-
             validInput = false;
 
         } else {
-            if (nameText.length() < 2 || nameText.length() > 256) {
+            // if not a valid name, meaning length is not between 2 and 256 characters inclusive
+            if(!inputValidator.isValidName(nameText)) {
                 nameErrorLabel.setVisible(true);
                 nameErrorLabel.setText("Item name must be between 2 and 256 characters.");
                 itemNameTextField.clear();
                 validInput = false;
             }
 
-            if (!(serialNumText.matches("[0-9A-Z]+") && serialNumText.length() == 10)) {
+            if (!inputValidator.isValidSerialNumber(serialNumText)) {
                 serialNumErrorLabel.setVisible(true);
                 serialNumErrorLabel.setText("Invalid Serial Number.");
                 itemSerialNumberTextField.clear();
                 validInput = false;
-            } else if (containsSerialNumber(serialNumText)) {
+
+            } else if (inputValidator.containsSerialNumber(itemModel, serialNumText)) {
                 errorMessage("Serial number already exists.");
                 itemSerialNumberTextField.clear();
                 validInput = false;
@@ -170,18 +165,8 @@ public class MainWindowController implements Initializable {
         }
     }
 
-
     public Item addItem(String serialNumber, String name, Double price) {
         return new Item(serialNumber, name, price);
-    }
-
-    public boolean containsSerialNumber(String serialNumText) {
-        for (int i = 0; i < itemModel.getItems().size(); i++) {
-            if (itemModel.getItems().get(i).getSerialNumber().equalsIgnoreCase(serialNumText)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void errorMessage(String contentText) {
@@ -205,43 +190,6 @@ public class MainWindowController implements Initializable {
         itemModel.getItems().remove(selectedItem);
     }
 
-
-    @FXML
-    void menuItemQuitClicked() {
-        Alert exitAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        Stage stage = (Stage) menuBar.getScene().getWindow();
-        exitAlert.setTitle("Exit Application");
-        exitAlert.setHeaderText("Are you sure you want to exit?");
-        exitAlert.initModality(Modality.APPLICATION_MODAL);
-        exitAlert.initOwner(stage);
-        exitAlert.showAndWait();
-
-        if (exitAlert.getResult() == ButtonType.OK) {
-            Platform.exit();
-        } else {
-            exitAlert.close();
-        }
-    }
-
-    @FXML
-    void menuItemGetHelpClicked() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Get Help");
-        alert.setHeaderText("Refer to file README.md in the GitHub Repository for the project");
-        alert.showAndWait();
-    }
-
-
-    // Method to return an ObservableList of Inventory Item Objects
-    public ObservableList<Item> getTestItems() {
-        ObservableList<Item> items = FXCollections.observableArrayList();
-        items.add(new Item("AXB124AXYE", "Xbox One", 399.00));
-        items.add(new Item("S40AZBDE4E", "Samsung TV", 599.99));
-        items.add(new Item("ABCDE12345", "iPad Pro", 999.99));
-        items.add(new Item("ABX4H321SW", "Microsoft Surface", 499.9945));
-
-        return items;
-    }
 
     @FXML
     void updateSelectedItemButtonClicked() throws IOException {
@@ -286,16 +234,20 @@ public class MainWindowController implements Initializable {
         return FXCollections.observableArrayList(filteredList);
     }
 
-
     // Return if an Item's Name or Serial Number contains the searchText
     public boolean searchFindsItem(Item item, String searchText) {
         return (item.getName().toLowerCase().contains(searchText.toLowerCase()) ||
             item.getSerialNumber().toLowerCase().contains(searchText.toLowerCase()));
     }
 
+    @FXML
+    void clearSearchButtonClicked(ActionEvent event) {
+        searchTextField.setText("");
+        event.consume();
+    }
 
 
-    // Save as ---------------------------------------------------------------------------------
+    /* SAVE A TSV, HTML OR JSON FILES */
     @FXML
     void menuItemSaveAsClicked() {
 
@@ -306,133 +258,28 @@ public class MainWindowController implements Initializable {
             new FileChooser.ExtensionFilter("JSON (JavaScript Object Notation)", "*.json"));
 
         File file = fileChooser.showSaveDialog(new Stage());
-        // save the chosen directory for next time
-        fileChooser.setInitialDirectory(file.getParentFile());
 
-        String fileName = file.getName();
-        String fileExtension = FilenameUtils.getExtension(fileName);
+        if (file != null) {
+            // save the chosen directory for next time
+            fileChooser.setInitialDirectory(file.getParentFile());
 
-        switch (fileExtension) {
-            case "txt":
-                fileManager.saveInventoryAsTSV(file, itemModel);
-                break;
-            case "html":
-                fileManager.saveInventoryAsHTML(file, itemModel);
-                break;
-            case "json":
-                fileManager.saveInventoryAsJSON(file, itemModel);
-                break;
+            String fileName = file.getName();
+            String fileExtension = FilenameUtils.getExtension(fileName);
+
+            switch (fileExtension) {
+                case "txt":
+                    fileManager.saveInventoryAsTSV(file, itemModel);
+                    break;
+                case "html":
+                    fileManager.saveInventoryAsHTML(file, itemModel);
+                    break;
+                case "json":
+                    fileManager.saveInventoryAsJSON(file, itemModel);
+                    break;
+            }
         }
+
     }
-
-//    public void writeToFile(File file, String string) {
-//        try {
-//            BufferedWriter outWriter = new BufferedWriter(new FileWriter(file));
-//            outWriter.write(string);
-//            outWriter.close();
-//
-//        } catch (IOException e) {
-//            System.out.println("A writing error has occurred.");
-//            e.printStackTrace();
-//        }
-//    }
-
-
-//    public void saveInventoryAsTSV(File file, ItemModel itemModel) {
-//        // Create TSV String
-//        String tsvString = buildTSVString(itemModel);
-//
-//        // Call writer function
-//        writeToFile(file, tsvString);
-//    }
-//
-//
-//    public void saveInventoryAsHTML(File file, ItemModel itemModel) {
-//        // Create html String
-//        String htmlString = buildHTMLString(itemModel);
-//
-//        // Call write function
-//        writeToFile(file, htmlString);
-//    }
-//
-//    public void saveInventoryAsJSON(File file, ItemModel itemModel) {
-//        // Create json String
-//        String jsonString = buildJSONString(itemModel);
-//
-//        // Call write function
-//        writeToFile(file, jsonString);
-//    }
-
-//
-//    public String buildTSVString(ItemModel itemModel) {
-//        StringBuilder buffer = new StringBuilder();
-//
-//        // Write one inventory Item per line and separate each field with a /t character
-//        for(int i = 0; i < itemModel.getItems().size(); i++) {
-//            buffer.append(itemModel.getItems().get(i).convertItemToTSVString());
-//            // New line for each Item
-//            buffer.append(System.lineSeparator());
-//        }
-//        return buffer.toString();
-//    }
-//
-//    public String buildHTMLString(ItemModel itemModel) {
-//        StringBuilder buffer = new StringBuilder();
-//        buffer.append("""
-//            <!DOCTYPE html>
-//            <html>
-//            <head>
-//              <title>OOP Assignment 5</title><style>
-//            table {
-//              font-family: arial, sans-serif;
-//              border-collapse: collapse;
-//              width: 40%;
-//            }
-//
-//            td, th {
-//              border: 1px solid #dddddd;
-//              text-align: left;
-//              padding: 8px;
-//            }
-//            </style>
-//            </head>
-//            <body>
-//            <h2>Inventory Tracker</h2>
-//            <table>
-//              <tr>
-//                <th>Serial Number</th>
-//                <th>Name</th>
-//                <th>Value in dollars</th>
-//              </tr>
-//            """);
-//        for (int i = 0; i < itemModel.getItems().size(); i++) {
-//            buffer.append("  <tr>\n    <td>")
-//                .append(itemModel.getItems().get(i).getSerialNumber())
-//                .append("</td>\n    <td>")
-//                .append(itemModel.getItems().get(i).getName())
-//                .append("</td>\n    <td>")
-//                .append(itemModel.getItems().get(i).getValue())
-//                .append("</td>\n  </tr>\n");
-//        }
-//        buffer.append("""
-//            </table>
-//            </body>
-//            </html>""");
-//
-//        return buffer.toString();
-//    }
-//
-//    public String buildJSONString(ItemModel itemModel) {
-//        // Custom decoder to make the Observables work with Gson
-//
-//        List<JsonItem> items = new ArrayList<>();
-//        for(int i = 0; i < itemModel.getItems().size(); i++) {
-//            items.add(new JsonItem(itemModel.getItems().get(i).getSerialNumber(), itemModel.getItems().get(i).getName(), itemModel.getItems().get(i).getValue()));
-//        }
-////        String json = new Gson().toJson(items);
-//        return new Gson().toJson(items);
-//    }
-
 
 
     /* LOAD A TSV, HTML OR JSON FILES */
@@ -445,35 +292,71 @@ public class MainWindowController implements Initializable {
             new FileChooser.ExtensionFilter("Web Page", "*.html"),
             new FileChooser.ExtensionFilter("JSON (JavaScript Object Notation)", "*.json"));
 
-        File file = fileChooser.showOpenDialog(new Stage());
-        System.out.println(file);
-        // save the chosen directory for next time
-        fileChooser.setInitialDirectory(file.getParentFile());
+        File selectedFile = fileChooser.showOpenDialog(new Stage());
+//        System.out.println(file);
 
-        String fileName = file.getName();
-//        System.out.println(fileName);
+        if (selectedFile != null) {
+            // save the chosen directory for next time
+            fileChooser.setInitialDirectory(selectedFile.getParentFile());
 
-        String fileExtension = FilenameUtils.getExtension(fileName);
-//        System.out.println(fileExtension);
+            String fileName = selectedFile.getName();
+            String fileExtension = FilenameUtils.getExtension(fileName);
 
-        // Remove previous Items from ItemModel
-        itemModel.getItems().clear();
+            // Remove previous Items from ItemModel
+            itemModel.getItems().clear();
 
-        List<Item> loadedList = new ArrayList<>();
+            List<Item> loadedList = new ArrayList<>();
 
-        switch (fileExtension) {
-            case "txt":
-                loadedList = fileManager.loadInventoryAsTSV(file);
-                break;
-            case "html":
-                loadedList = fileManager.loadInventoryAsHTML(file);
-                break;
-            case "json":
-                loadedList = fileManager.loadInventoryAsJSON(file);
-                break;
+            switch (fileExtension) {
+                case "txt":
+                    loadedList = fileManager.loadInventoryAsTSV(selectedFile);
+                    break;
+                case "html":
+                    loadedList = fileManager.loadInventoryAsHTML(selectedFile);
+                    break;
+                case "json":
+                    loadedList = fileManager.loadInventoryAsJSON(selectedFile);
+                    break;
+            }
+
+            // Add loaded Items from the file into the table
+            itemModel.getItems().addAll(FXCollections.observableArrayList(loadedList));
         }
+    }
 
-        // Add loaded Items from the file in the table
-        itemModel.getItems().addAll(FXCollections.observableArrayList(loadedList));
+    @FXML
+    void menuItemGetHelpClicked() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Get Help");
+        alert.setHeaderText("Refer to file README.md in the GitHub Repository for the project");
+        alert.showAndWait();
+    }
+
+    @FXML
+    void menuItemQuitClicked() {
+        Alert exitAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        Stage stage = (Stage) menuBar.getScene().getWindow();
+        exitAlert.setTitle("Exit Application");
+        exitAlert.setHeaderText("Are you sure you want to exit?");
+        exitAlert.initModality(Modality.APPLICATION_MODAL);
+        exitAlert.initOwner(stage);
+        exitAlert.showAndWait();
+
+        if (exitAlert.getResult() == ButtonType.OK) {
+            Platform.exit();
+        } else {
+            exitAlert.close();
+        }
+    }
+
+    // Method to return an ObservableList of Inventory Item Objects
+    public ObservableList<Item> getTestItems() {
+        ObservableList<Item> items = FXCollections.observableArrayList();
+        items.add(new Item("AXB124AXYE", "Xbox One", 399.00));
+        items.add(new Item("S40AZBDE4E", "Samsung TV", 599.99));
+        items.add(new Item("ABCDE12345", "iPad Pro", 999.99));
+        items.add(new Item("ABX4H321SW", "Microsoft Surface", 499.9945));
+
+        return items;
     }
 }
