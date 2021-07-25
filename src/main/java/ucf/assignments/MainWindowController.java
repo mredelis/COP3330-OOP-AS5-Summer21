@@ -17,6 +17,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -212,6 +213,7 @@ public class MainWindowController implements Initializable {
         Stage secondaryStage = new Stage();
         secondaryStage.setScene(updateItemScene);
         secondaryStage.setTitle("Update Item");
+        secondaryStage.getIcons().add(new Image("ucf/assignments/edit.png"));
         secondaryStage.initModality(Modality.APPLICATION_MODAL);
         secondaryStage.showAndWait();
 

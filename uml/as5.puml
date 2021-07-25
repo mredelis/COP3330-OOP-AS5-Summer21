@@ -36,12 +36,18 @@ class MainWindowController {
 }
 
 class FileManager {
-    saveAsTSV(filename: String), data: String)
-    saveAsJSON(filename: String), data: String)
-    saveAsHTML(filename: String), data: String)
+    saveAsTSV(filename: String, data: String)
+    saveAsJSON(filename: String, data: String)
+    saveAsHTML(filename: String, data: String)
 }
 
 class UpdateItemWindowController {
+}
+
+class InputValidator {
+    + isValidName(name: String)
+    + isValidSerialNumber(serialNumber: String)
+    + containsSerialNumber(itemModel: ItemModel, serialNumber: String)
 }
 
 
@@ -68,10 +74,12 @@ class Item {
 
 openjfx.org.Application <|-- InventoryTracker
 InventoryTracker -- MainWindowController
-MainWindowController o-- ItemModel
+MainWindowController -- ItemModel
 MainWindowController -- UpdateItemWindowController
-UpdateItemWindowController o-- ItemModel
-ItemModel *-- Item
-MainWindowController o-- FileManager
+MainWindowController -- InputValidator
+UpdateItemWindowController -- InputValidator
+UpdateItemWindowController -- ItemModel
+ItemModel -- Item
+MainWindowController -- FileManager
 
 @enduml

@@ -22,7 +22,6 @@ public class InventoryManager extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-
         try {
             Parent root = FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
 
@@ -35,7 +34,5 @@ public class InventoryManager extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
 }

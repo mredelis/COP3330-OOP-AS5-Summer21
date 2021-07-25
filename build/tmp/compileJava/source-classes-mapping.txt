@@ -1,18 +1,18 @@
-ucf/assignments/ItemModel.java
- ucf.assignments.ItemModel
-ucf/assignments/JsonItem.java
- ucf.assignments.JsonItem
-ucf/assignments/FileManager.java
- ucf.assignments.FileManager
- ucf.assignments.FileManager$1
-ucf/assignments/Item.java
- ucf.assignments.Item
+ucf/assignments/UpdateItemController.java
+ ucf.assignments.UpdateItemController
 ucf/assignments/InventoryManager.java
  ucf.assignments.InventoryManager
 ucf/assignments/InputValidator.java
  ucf.assignments.InputValidator
-ucf/assignments/UpdateItemController.java
- ucf.assignments.UpdateItemController
 ucf/assignments/MainWindowController.java
  ucf.assignments.MainWindowController
  ucf.assignments.MainWindowController$1
+ucf/assignments/JsonItem.java
+ ucf.assignments.JsonItem
+ucf/assignments/Item.java
+ ucf.assignments.Item
+ucf/assignments/ItemModel.java
+ ucf.assignments.ItemModel
+ucf/assignments/FileManager.java
+ ucf.assignments.FileManager
+ ucf.assignments.FileManager$1
