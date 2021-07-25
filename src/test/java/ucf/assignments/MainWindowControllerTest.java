@@ -1,12 +1,12 @@
 package ucf.assignments;
 
+import javafx.collections.ObservableList;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /*
@@ -48,7 +48,7 @@ class MainWindowControllerTest {
 
     @Test
     @DisplayName("Add new Inventory Item test")
-    void deleteItem() {
+    void deleteItemTest() {
         // Before deleting an Item, check the size is 4
         assertEquals(4, itemModelTest.getItems().size());
         // Check item at index 0 before deleting this item
@@ -63,15 +63,30 @@ class MainWindowControllerTest {
     }
 
     @Test
-    void filterList() {
+    @DisplayName("Create new ObservableList<Item> with items that math a search text")
+    void filterListTest() {
+        ObservableList<Item> list1 = controller.filterList(itemModelTest, "Pro");
+        ObservableList<Item> list2 = controller.filterList(itemModelTest, "Nike");
+
+        // Assert that two items of the itemModelTest contains the search text "Pro"
+        assertEquals(2, list1.size());
+        // Assert that one items of the itemModelTest contains the search text "Nike"
+        assertEquals(1, list2.size());
     }
 
     @Test
-    void searchFindsItem() {
+    @DisplayName("Check if a given Item contains a search text in the serial # or name")
+    void searchFindsItemTest() {
+        // Check if item at index 0 contains "Mac"
+        assertTrue(controller.searchFindsItem(itemModelTest.getItems().get(0), "Mac"));
+        // Check if item at index 0 contains "AA"
+        assertFalse(controller.searchFindsItem(itemModelTest.getItems().get(0), "AA"));
+        // Check if item at index 0 contains "12345"
+        assertTrue(controller.searchFindsItem(itemModelTest.getItems().get(0), "12345"));
     }
 
     @Test
-    void sortInventoryItems() {
+    void sortInventoryItemsTest() {
         // Since Table View handles sorting, and it is not required to test with TestFX
         // There is nothing to test for Sorting
     }

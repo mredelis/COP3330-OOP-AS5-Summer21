@@ -95,9 +95,8 @@ public class MainWindowController implements Initializable {
         // enters or edits the search
         // newValue is the text currently in the searchTextField
          searchTextField.textProperty().addListener((observable, oldValue, newValue) ->
-            tableView.setItems(filterList(newValue))
+            tableView.setItems(filterList(itemModel, newValue))
         );
-
     }
 
 
@@ -226,12 +225,12 @@ public class MainWindowController implements Initializable {
     /* METHODS TO AID SEARCH */
 
     // Loop through an ObservableList<Item> and create a new ObservableList<Item> with the items that match the searchText
-    public ObservableList<Item> filterList(String searchText) {
+    public ObservableList<Item> filterList(ItemModel itemModelTemp, String searchText) {
         List<Item> filteredList = new ArrayList<>();
 
-        for (int i = 0; i < itemModel.getItems().size(); i++) {
-            if (searchFindsItem(itemModel.getItems().get(i), searchText)) {
-                filteredList.add(itemModel.getItems().get(i));
+        for (int i = 0; i < itemModelTemp.getItems().size(); i++) {
+            if (searchFindsItem(itemModelTemp.getItems().get(i), searchText)) {
+                filteredList.add(itemModelTemp.getItems().get(i));
             }
         }
         return FXCollections.observableArrayList(filteredList);
