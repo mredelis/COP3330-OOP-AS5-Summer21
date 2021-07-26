@@ -1,54 +1,39 @@
 # How to use the Application
 
-***Per the instructions, this Application is dedicated to Rey***
+**1. Add a new Inventory Item**
+* Enter the Item Serial Number, Name, and Price in the Text Fields. 
+* Click on the "Add New Item" button to add the new Item to the table.
+* Before adding the item, the Application will check the following: 
+1.  All fields must be filled in.
+2.  Serial Number must be unique in the format of XXXXXXXXXX where X can be either a letter or digit.
+3. 	Name must be between 2 and 256 characters 
+4. Price is a valid number
 
-1. Add new item to the list
-* Enter task name in the Text Field and select due date from the Date Picker.
-* Click on the Add Task button to add the new task to the table
-* Note when a new task is created, the status is set to Incomplete by default
-* Both fields, Task Description and Due Date must be filled in to add a task
+**2. Remove an Item from the list**
+* To enable the "Delete Selected Item" button an item from the table should be selected. 
+* Once an item is selected, click "Delete Selected Item" button
 
-2. Remove an item from the list
-* Select item from the table
-* Click the Remove Task Button
+**3. Edit an Inventory Item**
+* To enable the "Edit Selected Item" button an item from the table should be selected. 
+* Once an item is selected, click "Edit Selected Item" button and a new window will pop up with the selected item.
+* Enter the new values and click on the "Update Item" button.
+* Same validations 1 through 4 in "Add a new Inventory Item" above will be performed before updating an Item.
 
-3. Clear the list of all items
-* Click the Clear List Button
-* Clear List Button is disabled if there is no item in the table
+**4. Search for an Inventory Item**
+* Enter the text to search in the Search Text Field and the table will populate the serial number and/or name of the items that meet the search criteria.
+* Click the X button on the right side of the search bar to clear the search 
 
-4. Edit Item Description and Due Date
-* Select item from the table (the description and due date will be populated in the Text Field and Date Picker)
-* Edit task description and/or due date
-* Click Update Task Button
+**5. Save Inventory Items as TSV, HTML or JSON**
+* Go to Menu File and click Save As...
+* When FileChooser prompts, select a location from the left pane to save the file and the format and type a name for the file.
 
-5. Mark Item as Complete or Incomplete
-* Double-click on the Status cell of the item
-* Select Complete or Incomplete from the drop down menu (ComboBox)
+**6. Load Inventory Items**
+* Go to Menu File and click Open File...
+* When FileChooser prompts, browse to the file location and select the file type
 
-6. Display All Items
-* This option is selected by default in the View Tasks ComboBox
-* To view All Task select "All" from the View Tasks ComboBox
+**7. Sort Inventory Items**
+* The table can be sorted by Serial Number, Item Name and Item Price.
+* Click on the corresponding column header to perform the sort
 
-7. Display Completed Items
-* Select Completed option from the View Tasks ComboBox
-
-8. Display Incomplete Items
-* Select Incompleted option from the View Tasks ComboBox
-
-9. Save List
-* Go to Menu File and click Save ToDo List
-* When FileChooser opens, select a location from the left pane to save the file and type a name for the file
-* The file will be saved as .txt
-
-10. Load a List
-* Go to Menu File and click Open ToDo List
-* When FileChooser prompts, browse to the file location and select .txt file.
-* Note the program will give an error if file cannot be opened or if file has incorrect format.
-
-11. Bonus Credit
-* To sort the list by due date, click on the Due Date Column of the table
-* All 3 columns of the table can be sorted.
-
-12. Additional notes
-* The Clear Fields Button clears Description Text Field and Due Date Picker.
-* To Exit the Application go to File/Quit
+**8. Exit the Application**
+* Go to File Menu and select Quit
